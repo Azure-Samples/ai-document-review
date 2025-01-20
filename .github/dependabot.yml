@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "terraform"
+    directory: "/infra/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "npm"
+    directory: "/app/ui/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+  - package-ecosystem: "pip"
+    directories:
+      - "/app/api/"
+      - "/flows/"
+      - "/flows/ai_doc_review/"
+      - "/flows/ai_doc_review/agent_template/"
+      - "/flows/ai_doc_review_eval/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+
