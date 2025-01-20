@@ -1,4 +1,4 @@
-version: "3.40.1"
+version: "3.41.0"
 
 tasks:
   app-build:
@@ -8,35 +8,20 @@ tasks:
       - task: deps-setup
     aliases:
       - ab
+    dir: app
     cmds:
-      - task: app-build-api
-      - task: app-build-ui
+      - |
+        echo -e "\033[0;32mBuilding API...\033[0m"
+        pushd api/
+        python3 -m venv .venv
+        .venv/bin/pip3 install -r requirements.txt
+        popd
 
-  app-build-api:
-    desc: Build API service.
-    silent: true
-    deps:
-      - task: deps-setup
-    aliases:
-      - aba
-    dir: app/api
-    cmds:
-      - echo -e "\033[0;32mBuilding API...\033[0m"
-      - python3 -m venv .venv
-      - .venv/bin/pip3 install -r requirements.txt
-
-  app-build-ui:
-    desc: Build UI service.
-    silent: true
-    deps:
-      - task: deps-setup
-    aliases:
-      - abu
-    dir: app/ui
-    cmds:
-      - echo -e "\033[0;32mBuilding UI...\033[0m"
-      - npm install --no-fund --no-audit
-      - npm run build
+        echo -e "\033[0;32mBuilding UI...\033[0m"
+        pushd ui/
+        npm install --no-fund --no-audit
+        npm run build
+        popd
 
   app-clean:
     desc: Remove build artifacts.
@@ -45,34 +30,19 @@ tasks:
       - task: deps-setup
     aliases:
       - ac
+    dir: app
     cmds:
-      - task: app-clean-api
-      - task: app-clean-ui
+      - |
+        echo -e "\033[0;32mRemoving API artifacts...\033[0m"
+        pushd app/api
+        rm -rf .venv
+        rm -rf www
+        popd
 
-  app-clean-api:
-    desc: Remove API build artifacts.
-    silent: true
-    deps:
-      - task: deps-setup
-    aliases:
-      - aca
-    dir: app/api
-    cmds:
-      - echo -e "\033[0;32mRemoving API artifacts...\033[0m"
-      - rm -rf .venv
-      - rm -rf www
-
-  app-clean-ui:
-    desc: Remove UI build artifacts.
-    silent: true
-    deps:
-      - task: deps-setup
-    aliases:
-      - acu
-    dir: app/ui
-    cmds:
-      - echo -e "\033[0;32mRemoving UI artifacts...\033[0m"
-      - rm -rf node_modules
+        echo -e "\033[0;32mRemoving UI artifacts...\033[0m"
+        pushd app/ui
+        rm -rf node_modules
+        popd
 
   app-deploy:
     desc: Deploy application to App Service.
@@ -107,14 +77,26 @@ tasks:
             --src-path "$ZIP_PATH" \
             --type zip
 
+  app-logs:
+    desc: Show application logs.
+    silent: true
+    aliases:
+      - al
+    dir: infra
+    cmds:
+      - |
+        echo -e "\033[0;32mShowing logs...\033[0m"
+        az webapp log tail -g $(terraform output -raw resource_group) -n $(terraform output -raw webapp_name)
+
   api-run:
     desc: Launch local API instance.
     silent: true
-    dir: app/api
     deps:
       - task: deps-setup
     aliases:
       - ar
+    dir: app/api
     cmds:
-      - echo -e "\033[0;32mLaunching API...\033[0m"
-      - .venv/bin/python3 -m uvicorn main:app --reload
+      - |
+        echo -e "\033[0;32mLaunching API...\033[0m"
+        .venv/bin/python3 -m uvicorn main:app --reload

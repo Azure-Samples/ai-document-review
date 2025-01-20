@@ -1,3 +1,8 @@
+/*
+  Resource
+  - Resource Group
+*/
+
 resource "azurerm_resource_group" "main" {
   name     = local.resource_name.resource_group
   location = var.location
@@ -64,7 +69,6 @@ resource "azapi_resource" "nsp_association" {
   - AI Foundry
   - AI Hub
   - AI Project
-  - AI Online Endpoint
   - AI Connections
 */
 
@@ -85,7 +89,8 @@ resource "azapi_resource" "ai_services" {
       apiProperties = {
         statisticsEnabled = false,
       }
-      restore = contains([for service in data.azapi_resource_list.ai_services.output.value : service.name], local.resource_name.ai_services)
+      restore             = contains([for service in data.azapi_resource_list.ai_services.output.value : service.name], local.resource_name.ai_services)
+      publicNetworkAccess = "Enabled"
     }
     kind = "AIServices"
     sku = {
@@ -173,27 +178,6 @@ resource "azapi_resource" "ai_project" {
   tags = merge(local.common_tags, {})
 }
 
-resource "azapi_resource" "ai_online_endpoint" {
-  type      = "Microsoft.MachineLearningServices/workspaces/onlineEndpoints@2024-10-01"
-  name      = local.resource_name.ai_online_endpoint
-  parent_id = azapi_resource.ai_project.id
-
-  body = {
-    properties = {
-      authMode = "AADToken"
-    }
-    kind     = "Managed"
-    location = azurerm_resource_group.main.location
-  }
-
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.ai_compute.id]
-  }
-
-  response_export_values = ["*"]
-}
-
 resource "azapi_resource" "ai_services_connection" {
   type      = "Microsoft.MachineLearningServices/workspaces/connections@2024-10-01"
   name      = "aisconns"
@@ -247,13 +231,13 @@ resource "azurerm_service_plan" "main" {
   resource_group_name = azurerm_resource_group.main.name
 
   os_type  = "Linux"
-  sku_name = "B1"
+  sku_name = "P0v3"
 
   tags = merge(local.common_tags, {})
 }
 
-resource "azurerm_linux_web_app" "main" {
-  name                = local.resource_name.web_app
+resource "azurerm_linux_web_app" "app" {
+  name                = local.resource_name.web_api_app
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -264,7 +248,8 @@ resource "azurerm_linux_web_app" "main" {
   webdeploy_publish_basic_authentication_enabled = false
 
   identity {
-    type = "SystemAssigned"
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.api.id]
   }
 
   site_config {
@@ -285,17 +270,107 @@ resource "azurerm_linux_web_app" "main" {
     "DATABASE_NAME"                   = azurerm_cosmosdb_sql_database.state.name
     "AAD_CLIENT_ID"                   = azuread_application.api_app.client_id
     "AAD_TENANT_ID"                   = data.azurerm_client_config.current.tenant_id
+    "AZURE_CLIENT_ID"                 = azurerm_user_assigned_identity.api.client_id
     "SUBSCRIPTION_ID"                 = data.azurerm_subscription.primary.subscription_id
     "RESOURCE_GROUP"                  = azurerm_resource_group.main.name
     "AI_HUB_PROJECT_NAME"             = azapi_resource.ai_project.name
     "AI_HUB_REGION"                   = azapi_resource.ai_hub.location
-    "AML_ENDPOINT_NAME"               = azapi_resource.ai_online_endpoint.name
-    "AML_STREAMING_BATCH_SIZE"        = 10
+    "FLOW_CLIENT_ID"                  = azuread_application.flow_app.client_id
+    "FLOW_ENDPOINT_NAME"              = azurerm_linux_web_app.flow.name
+    "FLOW_APP_NAME"                   = azuread_application.flow_app.display_name
+    "FLOW_STREAMING_BATCH_SIZE"       = 100
     "APPINSIGHTS_INSTRUMENTATION_KEY" = azurerm_application_insights.main.instrumentation_key
     "LOG_LEVEL"                       = "INFO"
   }
 
+  logs {
+    application_logs {
+      file_system_level = "Verbose"
+    }
+    http_logs {
+      file_system {
+        retention_in_days = "1"
+        retention_in_mb   = "35"
+      }
+    }
+    detailed_error_messages = true
+    failed_request_tracing  = true
+  }
+
   tags = merge(local.common_tags, {})
+}
+
+resource "azurerm_linux_web_app" "flow" {
+  name                = local.resource_name.web_flow_app
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  service_plan_id                                = azurerm_service_plan.main.id
+  public_network_access_enabled                  = true
+  https_only                                     = true
+  ftp_publish_basic_authentication_enabled       = false
+  webdeploy_publish_basic_authentication_enabled = false
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.ai_compute.id]
+  }
+
+  site_config {
+    websockets_enabled = true
+    app_command_line   = "pf flow serve --source . --port 8000 --host 0.0.0.0 --engine fastapi --skip-open-browser"
+
+    application_stack {
+      python_version = "3.12"
+    }
+  }
+
+  app_settings = {
+    "SCM_DO_BUILD_DURING_DEPLOYMENT"           = "true"
+    "DEBUG"                                    = "True"
+    "DOCUMENT_INTELLIGENCE_ENDPOINT"           = "https://ais${var.name}${var.environment}.cognitiveservices.azure.com"
+    "STORAGE_URL_PREFIX"                       = "${azurerm_storage_account.main.primary_blob_endpoint}/${azurerm_storage_container.documents.name}"
+    "AZURE_OPENAI_ENDPOINT"                    = "https://ais${var.name}${var.environment}.openai.azure.com"
+    "AZURE_CLIENT_ID"                          = azurerm_user_assigned_identity.ai_compute.client_id
+    "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET" = azuread_application_password.flow_app.value
+    "USER_AGENT"                               = "promptflow-appservice"
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"    = azurerm_application_insights.main.connection_string
+  }
+
+  auth_settings_v2 {
+    auth_enabled           = true
+    require_authentication = true
+    unauthenticated_action = "Return401"
+    require_https          = true
+    active_directory_v2 {
+      tenant_auth_endpoint = "https://login.microsoftonline.com/${data.azurerm_client_config.current.tenant_id}/v2.0"
+      client_id                  = azuread_application.flow_app.client_id
+      client_secret_setting_name = "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
+      allowed_audiences          = ["${azuread_application.flow_app.client_id}"]
+      allowed_applications = [
+        "${azuread_application.flow_app.client_id}",
+        "04b07795-8ddb-461a-bbee-02f9e1bf7b46" # Azure CLI
+      ]
+      www_authentication_disabled = true
+    }
+    login {
+      token_store_enabled = true
+    }
+  }
+
+  logs {
+    application_logs {
+      file_system_level = "Verbose"
+    }
+    http_logs {
+      file_system {
+        retention_in_days = "1"
+        retention_in_mb   = "35"
+      }
+    }
+    detailed_error_messages = true
+    failed_request_tracing  = true
+  }
 }
 
 resource "azurerm_application_insights" "main" {
@@ -320,7 +395,6 @@ resource "azurerm_key_vault" "main" {
   tags = merge(local.common_tags, {})
 }
 
-
 resource "azurerm_storage_account" "main" {
   name                = local.resource_name.storage_account
   location            = azurerm_resource_group.main.location
@@ -344,7 +418,7 @@ resource "azurerm_storage_account" "main" {
         "https://ai.azure.com",
         "https://*.ai.azure.com",
         "http://localhost:5173",
-        "https://${local.resource_name.web_app}.azurewebsites.net"
+        "https://${local.resource_name.web_api_app}.azurewebsites.net"
       ]
       exposed_headers    = ["*"]
       max_age_in_seconds = 3600

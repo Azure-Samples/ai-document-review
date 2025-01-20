@@ -52,7 +52,7 @@ class IssuesService:
             logging.info(f"Initiating review for document {pdf_name}")
 
             # Initiate review to get a stream of issues
-            stream_data = self.aml_client.call_aml_endpoint(settings.aml_endpoint_name, pdf_name)
+            stream_data = self.aml_client.call_aml_endpoint(settings.flow_endpoint_name, pdf_name)
             async for chunk in stream_data:
                 flow_output = FlowOutputChunk.model_validate_json(chunk)
                 issues = [
@@ -85,7 +85,7 @@ class IssuesService:
             issue_id: The ID of the issue.
             doc_id: The ID of the document.
             user: The user object.
-            modified_fields: optional - fields modified by user.    
+            modified_fields: optional - fields modified by user.
         """
         try:
             issue = await self.issues_repository.get_issue(doc_id, issue_id)

@@ -23,7 +23,6 @@ task -a
 - Infrastructure:
 
   - `infra-deploy`, `infra-destroy`, `infra-plan`: Automate provisioning, updating, and destroying of Azure resources using Terraform.
-  - `infra-state-*`: Manage and inspect the state of deployed infrastructure.
 
 - Application:
 
@@ -38,6 +37,9 @@ task -a
 
   - `api-run`: Launch the API locally for testing and development.
   - `deps-*`: Ensure dependencies are installed and toolchains are set up correctly.
+
+  - `app-logs`: Starts logging session from App Service for the API.
+  - `flow-logs`: Starts streaming logging session from App Service for the flow endpoint.
 
 ## Deploying the solution
 
@@ -69,7 +71,9 @@ task infra-init
 cp infra/environments/local.tfvars.sample infra/environments/local.tfvars
 ```
 
-> NOTE: the `ml_engineers` variable determines the users/groups to provide access to edit PromptFlow flows, use Foundry AI compute, and access other resources required to author AI agents. We recommend creating an Entra ID Group for this, and adding its Object ID to the `ml_engineers` array. This way, you won't need to redeploy to add or remove users from the group to provide permissions - you can do so directly in Entra.
+> NOTE: The `ml_engineers` variable determines the users/groups to provide access to edit PromptFlow flows, use Foundry AI compute, and access other resources required to author AI agents. We recommend creating an Entra ID Group for this, and adding its Object ID to the `ml_engineers` array. This way, you won't need to redeploy to add or remove users from the group to provide permissions - you can do so directly in Entra.
+
+> NOTE: The `subscription_id` must correspond to the active subscription selected in the Azure CLI. To verify the current subscription, run `az account show`. If you need to switch to a different subscription, use `az account set -s {subscription-id}`.
 
 2. Edit `local.tfvars` with environment-specific configurations such as region, resource names, and other parameters.
 
@@ -90,7 +94,7 @@ task app-build
 task app-deploy
 ```
 
-> Note: the deployment may take a few minutes to complete. You might see a 504 error (GatewayTimeout), but the deployment will still be running in the background. If so, follow the link in the error output to view the deployment logs.
+> NOTE: The deployment may take a few minutes to complete. You might see a 504 error (GatewayTimeout), but the deployment will still be running in the background. If so, follow the link in the error output to view the deployment logs.
 
 ### Deploy PromptFlow endpoint
 
@@ -129,30 +133,23 @@ You can click each to view more details and accept or dismiss them, and optional
 1. Create a virtualenv for the API if it doesn't already exist and install the required packages:
 
    ```bash
-   cd app/api
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
+   task app-build
    ```
 
 2. Select the new venv Python interpreter in Visual Studio Code
 
    `Ctrl+Shift+P` > `Python: Select Interpreter` > `app/api/.venv/bin/python3`
 
-3. Install the required packages for the web UI:
+3. Ensure you are logged in to Azure in the VS Code terminal so the API can retrieve required credentials
 
    ```bash
-   cd app/ui
-   npm install
+   az login --scope "{app-id-uri}/user_impersonation"
    ```
 
-4. Ensure you are logged in to Azure in the VS Code terminal so the API can retrieve required credentials
+> NOTE: Note: You can locate the `app-id-uri` by navigating to the Entra ID App Registration and viewing the `adr-flow-adr-{name}` application.
+> Alternatively, you can retrieve it by running the following command: `cd infra && terraform output flow_app_id_uri`
 
-   ```bash
-   az login
-   ```
-
-5. Select the compound debug profile `App (UI & API)` in Visual Studio Code and press Debug
+4. Select the compound debug profile `App (UI & API)` in Visual Studio Code and press Debug
 
 #### Debugging Tips
 

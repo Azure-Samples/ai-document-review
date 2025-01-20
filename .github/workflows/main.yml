@@ -31,9 +31,9 @@ jobs:
         id: infra-auth
         run: az login --identity
 
-      - name: Apply Infrastructure
-        id: infra-apply
-        run: task infra-apply
+      - name: Deploy Infrastructure
+        id: infra-deploy
+        run: task infra-deploy
 
       - name: Destroy Infrastructure
         id: infra-destroy
@@ -56,15 +56,9 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build API Service
-        id: app-build-api
-        run: task app-build-api
-        env:
-          CI: false
-
-      - name: Build UI Service
-        id: app-build-ui
-        run: task app-build-ui
+      - name: Build Application
+        id: app-build
+        run: task app-build
         env:
           CI: false
 
@@ -83,18 +77,22 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy Flows
-        id: flow-deploy
-        run: task flow-deploy
+      - name: Build Flows
+        id: flow-build
+        run: task flow-build
 
       - name: Deploy Agent Flows
-        id: flow-deploy-agent
-        run: task flow-deploy-agent
+        id: flow-create-agent
+        run: task flow-create-agent
 
       - name: Deploy Evaluation Flows
-        id: flow-deploy-eval
-        run: task flow-deploy-eval
+        id: flow-create-eval
+        run: task flow-create-eval
+
+      - name: Deploy Review Flows
+        id: flow-create-review
+        run: task flow-create-review
 
       - name: Deploy ML Endpoints
-        id: flow-deploy-ml
-        run: task flow-deploy-
+        id: flow-deploy
+        run: task flow-deploy

@@ -2,10 +2,11 @@ azure-ai-formrecognizer==3.3.3
 asttokens==2.4.1
 json5==0.9.5
 openai==1.43.0
-promptflow_typed_llm==0.0.8
 shapely==2.0.6
 pymupdf==1.24.11
 promptflow==1.17.1
 promptflow[azure]==1.17.1
 promptflow-tools==1.4.0
+promptflow_typed_llm==0.0.8
 httpx==0.27.2
+uvicorn[standard]==0.32.0
