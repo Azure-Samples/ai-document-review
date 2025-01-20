@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@azure/core-auth": "^1.9.0",
-    "@azure/identity": "^4.5.0",
+    "@azure/identity": "^4.6.0",
     "@azure/msal-browser": "^3.28.0",
     "@azure/msal-react": "^2.2.0",
     "@azure/storage-blob": "^12.26.0",
