@@ -3,7 +3,8 @@
   "features": {
     "ghcr.io/ljtill/features/task:latest": {
       "version": "3.40.1"
-    }
+    },
+    "ghcr.io/azure/azure-dev/azd:latest": {}
   },
   "customizations": {
     "vscode": {
