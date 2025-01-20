@@ -3,7 +3,7 @@ pydantic==2.8.2
 azure-identity==1.17.1
 pydantic-settings==2.4.0
 azure-cosmos==4.7.0
-fastapi-azure-auth==5.0.0
+fastapi-azure-auth==5.0.1
 marshmallow==3.19.0
 azure-ai-ml==1.19.0
 sseclient-py==1.8.0
