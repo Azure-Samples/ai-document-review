@@ -66,6 +66,8 @@ Make sure to follow the steps outlined in [the Getting Started guide](../getting
    Click on the link and click "Start compute sesssion" to start working with the flow.
 
    ![PromptflowUI](../images/PromptflowUI.png)
+   
+   > For you to have access to edit and run flows in the portal and access resources that flows depend on, your Entra user object ID will need to be in the `ml_engineers` variable in the `infra/environments/{env_name}.tfvars` file (or within an Entra group referenced by its object ID) when the infrastructure is deployed/updated.
 
    For more information on development with promptflow, refer to the [official documentation](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/prompt-flow).
 
