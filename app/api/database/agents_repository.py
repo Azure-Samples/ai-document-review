@@ -17,6 +17,7 @@ class AgentsRepository:
 
         Args:
             name (str): The name of the agent to retrieve.
+            type (str): The type of the agent to retrieve
 
         Returns:
             Agent: The agent with the specified name.

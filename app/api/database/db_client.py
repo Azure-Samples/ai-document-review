@@ -43,6 +43,7 @@ class CosmosDBClient:
             return items_list
         except CosmosHttpResponseError as e:
             logging.error(f"An error occurred while retrieving items: {e}")
+            raise e
 
 
     async def retrieve_item_by_id(self, item_id: str, partition_key: str) -> Optional[Dict[str, Any]]:

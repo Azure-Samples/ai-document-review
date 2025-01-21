@@ -86,8 +86,7 @@ async def delete_agent(
 
     """
     try:
-        deleted_agent_id = await agents_service.delete_agent(agent_id)
-        return deleted_agent_id
+        await agents_service.delete_agent(agent_id)
     except Exception as e:
         logging.error(f"Error deleting agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -114,6 +113,9 @@ async def update_agent(
         agent_id (str): The agent ID to update.
         agent (Agent): The agent to update.
         user (Depends): The authenticated user.
+    
+    Returns:
+        str: The updated agent ID.
     """
     try:
         updated_agent_id = await agents_service.update_agent(agent_id, agent, user)

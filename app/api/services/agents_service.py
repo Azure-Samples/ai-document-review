@@ -83,7 +83,7 @@ class AgentsService:
             update_fields = {
                 "name": agent.name,
                 "type": agent.type,
-                "text": agent.text,
+                "guideline_prompt": agent.guideline_prompt,
                 "updated_at_UTC": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 "updated_by": user.oid
             }

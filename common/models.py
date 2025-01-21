@@ -103,7 +103,7 @@ class Agent(BaseModel):
     id: str
     type: str
     name: str
-    text: str
+    guideline_prompt: str
     created_by: str
     created_at_UTC: str
     updated_by: Optional[str] = None
@@ -113,25 +113,38 @@ class Agent(BaseModel):
     def validate_name_and_type(cls, value, field):
         return validate_text(value, field, text_max_length)
 
-    @field_validator("text")
+    @field_validator("guideline_prompt")
     def validate_text(cls, value, field):
         return validate_text(value, field, long_text_max_length)
 
 class InputAgent(BaseModel):
     name: str
-    text: str
+    guideline_prompt: str
     type: str
 
     @field_validator("name", "type")
     def validate_name_and_type(cls, value, field):
         return validate_text(value, field, text_max_length)
 
-    @field_validator("text")
-    def validate_text(cls, value, field):
+    @field_validator("guideline_prompt")
+    def validate_guidelines_prompt(cls, value, field):
         return validate_text(value, field, long_text_max_length)
 
 
 def validate_text(value, field, length_limit):
+    """
+    Validate the text value of given field.
+    Check that the field value is not empty, does not exceed the length limit, 
+    and does not contain disallowed special characters.
+
+    Args:
+        value: The field value to validate.
+        field: The field name.
+        length_limit: The maximum length allowed for the field value.
+
+    Returns:
+        The validated field value.
+    """
     if not value:
         raise ValueError(f"{field.name} cannot be empty")
     text_length = len(value.strip())
