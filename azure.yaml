@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: ai-document-review
+metadata:
+  template: ai-document-review@1.0.0
+infra:
+  provider: terraform
+services:
+  app:
+    project: app/api
+    host: appservice
+    language: python
+    hooks:
+      # Build the UI code into the API's www directory.
+      prepackage:
+        shell: sh
+        run: 'task app-build-ui'
+  flows:
+    project: flows
+    host: appservice
+    language: python
