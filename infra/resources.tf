@@ -422,5 +422,5 @@ resource "azurerm_cosmosdb_sql_container" "agents" {
   account_name  = azurerm_cosmosdb_account.main.name
   database_name = azurerm_cosmosdb_sql_database.state.name
 
-  partition_key_paths = ["/type"]
+  partition_key_paths = ["/id"]
 }
