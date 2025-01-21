@@ -1,7 +1,12 @@
-from pydantic import BaseModel
+import re
+from pydantic import BaseModel, field_validator
 from enum import Enum
 from typing import Optional
 
+
+text_max_length = 50
+long_text_max_length = 5000
+allowed_special_characters = r"[\[\]\,\.\!\?\:\"\'\-\(\)\_\$\£\#\@\+\=\&\%\*\!\/]"
 
 class Location(BaseModel):
     source_sentence: str
@@ -92,3 +97,47 @@ class Issue(BaseModel):
 
     class Config:
         use_enum_values = True
+
+
+class Agent(BaseModel):
+    id: str
+    type: str
+    name: str
+    text: str
+    created_by: str
+    created_at_UTC: str
+    updated_by: Optional[str] = None
+    updated_at_UTC: Optional[str] = None
+
+    @field_validator("name", "type")
+    def validate_name_and_type(cls, value, field):
+        return validate_text(value, field, text_max_length)
+
+    @field_validator("text")
+    def validate_text(cls, value, field):
+        return validate_text(value, field, long_text_max_length)
+
+class InputAgent(BaseModel):
+    name: str
+    text: str
+    type: str
+
+    @field_validator("name", "type")
+    def validate_name_and_type(cls, value, field):
+        return validate_text(value, field, text_max_length)
+
+    @field_validator("text")
+    def validate_text(cls, value, field):
+        return validate_text(value, field, long_text_max_length)
+
+
+def validate_text(value, field, length_limit):
+    if not value:
+        raise ValueError(f"{field.name} cannot be empty")
+    text_length = len(value.strip())
+    if text_length == 0 or text_length > length_limit:
+        raise ValueError(f"{field} must between 1 to {length_limit} characters long.")
+    disallowed_pattern = r"[^\w\s" + re.escape(allowed_special_characters) + "]"
+    if re.search(disallowed_pattern, value):
+        raise ValueError(f"{field} contains disallowed special characters.")
+    return value

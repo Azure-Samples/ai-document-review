@@ -28,6 +28,22 @@ class CosmosDBClient:
             logging.error(f"An error occurred while storing the item: {e}")
             raise e
 
+    async def retrieve_items(self) -> Optional[List[Dict[str, Any]]]:
+        """
+        Retrieve all items from the Cosmos DB container.
+
+        :return: A list of all items, or None if an error occurs.
+        """
+        try:
+            items = self.container.query_items(
+                query="SELECT * FROM c",
+                enable_cross_partition_query=True,
+            )
+            items_list = list(items)
+            return items_list
+        except CosmosHttpResponseError as e:
+            logging.error(f"An error occurred while retrieving items: {e}")
+
 
     async def retrieve_item_by_id(self, item_id: str, partition_key: str) -> Optional[Dict[str, Any]]:
         """
@@ -76,3 +92,20 @@ class CosmosDBClient:
         except CosmosHttpResponseError as e:
             logging.error(f"An error occurred while retrieving items: {e}")
             return None
+
+
+    async def delete_item(self, item_id: str) -> None:
+        """
+        Delete an item from the Cosmos DB container by its ID.
+
+        :param item_id: The ID of the item to delete.
+        """
+        try:
+            self.container.delete_item(item=item_id, partition_key=item_id)
+            logging.info(f"Item with ID {item_id} deleted successfully.")
+        except CosmosHttpResponseError as e:
+            if e.status_code == 404:
+                logging.warning(f"Item with ID {item_id} not found.")
+            else:
+                logging.error(f"An error occurred while deleting the item: {e}")
+                raise e
