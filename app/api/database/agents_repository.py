@@ -11,7 +11,7 @@ class AgentsRepository:
         """Initialize the AgentsRepository with a CosmosDBClient."""
         self.db_client = CosmosDBClient(settings.agents_container)
 
-    async def get_agent_by_name_and_type(self, name: str, type: str) -> Agent:
+    async def get_agents_by_name_and_type(self, name: str, type: str) -> List[Agent]:
         """
         Retrieve an agent by name.
 

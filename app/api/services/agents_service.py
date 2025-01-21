@@ -40,7 +40,7 @@ class AgentsService:
         """
         try:
             logging.debug("Creating an agent")
-            existing_agents = await self.agents_repository.get_agent_by_name_and_type(agent.name, agent.type)
+            existing_agents = await self.agents_repository.get_agents_by_name_and_type(agent.name, agent.type)
             if len(existing_agents) > 0:
                 raise ValueError(f"Agent with name {agent.name} and type {agent.type} already exists")
             new_agent = Agent(
