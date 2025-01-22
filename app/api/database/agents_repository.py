@@ -1,6 +1,6 @@
 from common.logger import get_logger
 from typing import Any, Dict, List
-from common.models import Agent, InputAgent
+from common.models import Agent
 from config.config import settings
 from database.db_client import CosmosDBClient
 
@@ -51,9 +51,10 @@ class AgentsRepository:
             Agent: The created agent
         """
         logging.info("Creating an agent.")
-        await self.db_client.store_item(agent.model_dump())
-        logging.info(f"Created agent: {agent.id}")
-        return agent.id
+        new_agent_data = await self.db_client.store_item(agent.model_dump())
+        new_agent = Agent(**new_agent_data)
+        logging.info(f"Agent created: {new_agent.id}")
+        return new_agent
     
     async def delete_agent(self, agent_id: str) -> None:
         """
@@ -79,8 +80,8 @@ class AgentsRepository:
             for field, value in fields.items():
                 agent[field] = value
 
-            await self.db_client.store_item(agent)
-            logging.info(f"Agent {agent_id} updated.")
-            return Agent(**agent)
+            updated_agent = await self.db_client.store_item(agent)
+            logging.info(f"Agent updated: {agent_id}")
+            return Agent(**updated_agent)
         else:
             raise ValueError(f"Agent {agent_id} not found.")

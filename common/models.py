@@ -1,5 +1,5 @@
 import re
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, model_validator, root_validator
 from enum import Enum
 from typing import Optional
 
@@ -117,7 +117,7 @@ class Agent(BaseModel):
     def validate_text(cls, value, field):
         return validate_text(value, field, long_text_max_length)
 
-class InputAgent(BaseModel):
+class CreateAgent(BaseModel):
     name: str
     guideline_prompt: str
     type: str
@@ -129,6 +129,29 @@ class InputAgent(BaseModel):
     @field_validator("guideline_prompt")
     def validate_guidelines_prompt(cls, value, field):
         return validate_text(value, field, long_text_max_length)
+
+class UpdateAgent(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    guideline_prompt: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_at_least_one_field(cls, values):
+        if not any([values.name, values.type, values.guideline_prompt]):
+            raise ValueError("At least one of 'name', 'type', or 'guideline_prompt' must be provided.")
+        return values
+    
+    @field_validator("name", "type")
+    def validate_name_and_type(cls, value, field):
+        if value:
+            return validate_text(value, field, text_max_length)
+        return value
+
+    @field_validator("guideline_prompt")
+    def validate_text(cls, value, field):
+        if value:
+            return validate_text(value, field, long_text_max_length)
+        return value
 
 
 def validate_text(value, field, length_limit):

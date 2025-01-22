@@ -15,15 +15,16 @@ class CosmosDBClient:
         self.container = self.database.get_container_client(container_name)
 
 
-    async def store_item(self, item: Dict[str, any]) -> None:
+    async def store_item(self, item: Dict[str, any]) -> Dict[str, any]:
         """
         Store an item in the Cosmos DB container.
 
         :param item: A dictionary representing the item to store. Must contain an 'id' field.
         """
         try:
-            self.container.upsert_item(body=item)
+            item = self.container.upsert_item(body=item)
             logging.info("Item stored successfully.")
+            return item
         except CosmosHttpResponseError as e:
             logging.error(f"An error occurred while storing the item: {e}")
             raise e
