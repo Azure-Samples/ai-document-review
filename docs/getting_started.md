@@ -69,6 +69,8 @@ task infra-init
 cp infra/environments/local.tfvars.sample infra/environments/local.tfvars
 ```
 
+> NOTE: the `ml_engineers` variable determines the users/groups to provide access to edit PromptFlow flows, use Foundry AI compute, and access other resources required to author AI agents. We recommend creating an Entra ID Group for this, and adding its Object ID to the `ml_engineers` array. This way, you won't need to redeploy to add or remove users from the group to provide permissions - you can do so directly in Entra.
+
 2. Edit `local.tfvars` with environment-specific configurations such as region, resource names, and other parameters.
 
 3. Deploy infrastructure:
