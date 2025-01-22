@@ -110,12 +110,12 @@ class Agent(BaseModel):
     updated_at_UTC: Optional[str] = None
 
     @field_validator("name", "type")
-    def validate_name_and_type(cls, value, field):
-        return validate_text(value, field, text_max_length)
+    def validate_name_and_type(cls, value):
+        return validate_text(value, text_max_length)
 
     @field_validator("guideline_prompt")
-    def validate_text(cls, value, field):
-        return validate_text(value, field, long_text_max_length)
+    def validate_text(cls, value):
+        return validate_text(value, long_text_max_length)
 
 class CreateAgent(BaseModel):
     name: str
@@ -123,38 +123,33 @@ class CreateAgent(BaseModel):
     type: str
 
     @field_validator("name", "type")
-    def validate_name_and_type(cls, value, field):
-        return validate_text(value, field, text_max_length)
+    def validate_name_and_type(cls, value):
+        return validate_text(value, text_max_length)
 
     @field_validator("guideline_prompt")
-    def validate_guidelines_prompt(cls, value, field):
-        return validate_text(value, field, long_text_max_length)
+    def validate_guidelines_prompt(cls, value):
+        return validate_text(value, long_text_max_length)
 
 class UpdateAgent(BaseModel):
     name: Optional[str] = None
     type: Optional[str] = None
     guideline_prompt: Optional[str] = None
 
-    @model_validator(mode="after")
-    def validate_at_least_one_field(cls, values):
-        if not any([values.name, values.type, values.guideline_prompt]):
-            raise ValueError("At least one of 'name', 'type', or 'guideline_prompt' must be provided.")
-        return values
     
     @field_validator("name", "type")
-    def validate_name_and_type(cls, value, field):
+    def validate_name_and_type(cls, value):
         if value:
-            return validate_text(value, field, text_max_length)
+            return validate_text(value, text_max_length)
         return value
 
     @field_validator("guideline_prompt")
-    def validate_text(cls, value, field):
+    def validate_text(cls, value):
         if value:
-            return validate_text(value, field, long_text_max_length)
+            return validate_text(value, long_text_max_length)
         return value
 
 
-def validate_text(value, field, length_limit):
+def validate_text(value, length_limit):
     """
     Validate the text value of given field.
     Check that the field value is not empty, does not exceed the length limit, 
@@ -169,11 +164,11 @@ def validate_text(value, field, length_limit):
         The validated field value.
     """
     if not value:
-        raise ValueError(f"{field.name} cannot be empty")
+        raise ValueError(f"Cannot be empty")
     text_length = len(value.strip())
     if text_length == 0 or text_length > length_limit:
-        raise ValueError(f"{field} must between 1 to {length_limit} characters long.")
+        raise ValueError(f"Must between 1 to {length_limit} characters long.")
     disallowed_pattern = r"[^\w\s" + re.escape(allowed_special_characters) + "]"
     if re.search(disallowed_pattern, value):
-        raise ValueError(f"{field} contains disallowed special characters.")
+        raise ValueError(f"Contains disallowed special characters.")
     return value

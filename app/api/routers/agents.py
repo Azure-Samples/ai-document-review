@@ -1,7 +1,5 @@
-from http.client import HTTPResponse
-
 from fastapi.responses import JSONResponse
-from common.Exceptions import AgentConflictError
+from common.Exceptions import ConflictError, ResourceNotFoundError
 from dependencies import get_agents_service
 from common.logger import get_logger
 from typing import List
@@ -30,6 +28,9 @@ async def get_agents(
 
     Args:
         user (Depends): The authenticated user.
+    
+    Returns:
+        List[Agent]: List of all agents.
     """
     try:
         agents = await agents_service.get_all_agents()
@@ -58,15 +59,18 @@ async def create_agent(
     Create an agent.
 
     Args:
-        agent (Agent): The agent to create.
+        agent (CreateAgent): The agent to create.
         user (Depends): The authenticated user.
+    
+    Returns:
+        str: The created agent object.
     """
     try:
         created_agent = await agents_service.create_agent(agent, user)
         return JSONResponse(status_code=201, content=created_agent.dict())
     except ValueError as exc:
         raise HTTPException(status_code=400, detail={"description": str(exc)})     
-    except AgentConflictError as ex:
+    except ConflictError as ex:
         raise HTTPException(status_code=409, detail={"description": str(ex)})
     except Exception as e:
         logging.error(f"Error creating agent: {str(e)}")
@@ -80,6 +84,7 @@ async def create_agent(
         401: {"description": "Unauthorized"},
         500: {"description": "Internal server error"},
     },
+    status_code=204,  # Explicitly set the response code
 )
 async def delete_agent(
     agent_id,
@@ -92,12 +97,13 @@ async def delete_agent(
     Args:
         agent_id (str): The agent ID to delete.
         user (Depends): The authenticated.
-        agents_service (Depends): The agents service.
+    
+    Returns:
+        No Content
 
     """
     try:
         await agents_service.delete_agent(agent_id)
-        return HTTPResponse(status=204, content={})
     except Exception as e:
         logging.error(f"Error deleting agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -110,7 +116,8 @@ async def delete_agent(
         401: {"description": "Unauthorized"},
         500: {"description": "Internal server error"},
         400: {"description": "Bad request"},
-
+        409: {"description": "Conflict"},
+        404: {"description": "Not found"},
     },
 )
 async def update_agent(
@@ -124,19 +131,21 @@ async def update_agent(
 
     Args:
         agent_id (str): The agent ID to update.
-        agent (Agent): The agent to update.
+        agent (UpdateAgent): The agent to update.
         user (Depends): The authenticated user.
     
     Returns:
-        str: The updated agent ID.
+        str: The updated agent.
     """
     try:
         updated_agent = await agents_service.update_agent(agent_id, agent, user)
-        return HTTPResponse(status=200, content=updated_agent)
+        return JSONResponse(status_code=200, content=updated_agent.dict())
     except ValueError as ex:
         raise HTTPException(status_code=400, detail={"description": str(ex)})
-    except AgentConflictError as ex:
+    except ConflictError as ex:
         raise HTTPException(status_code=409, detail={"description": str(ex)})
+    except ResourceNotFoundError as ex:
+        raise HTTPException(status_code=404, detail={"description": str(ex)})
     except Exception as e:
         logging.error(f"Error updating agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")

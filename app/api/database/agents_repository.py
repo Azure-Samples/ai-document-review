@@ -1,3 +1,4 @@
+from common.Exceptions import ResourceNotFoundError
 from common.logger import get_logger
 from typing import Any, Dict, List
 from common.models import Agent
@@ -11,22 +12,39 @@ class AgentsRepository:
         """Initialize the AgentsRepository with a CosmosDBClient."""
         self.db_client = CosmosDBClient(settings.agents_container)
 
-    async def get_agents_by_name_and_type(self, name: str, type: str) -> List[Agent]:
+
+    async def get_agent_by_id(self, agent_id: str) -> Agent:
         """
-        Retrieve an agent by name.
+        Retrieve an agent by ID.
 
         Args:
-            name (str): The name of the agent to retrieve.
-            type (str): The type of the agent to retrieve
+            agent_id (str): The ID of the agent to retrieve.
 
         Returns:
-            Agent: The agent with the specified name.
+            Agent: The agent with the specified ID.
         """
-        logging.info(f"Retrieving agent by name and type {name}, {type}")
+        logging.info(f"Retrieving agent by ID: {agent_id}")
+        agent = await self.db_client.retrieve_item_by_id(agent_id, agent_id)
+        if not agent:
+            return None
+        logging.info(f"Retrieved agent by ID: {agent}")
+        return Agent(**agent)
+
+    async def get_agents_by_name_and_type(self, name: str, type: str) -> List[Agent]:
+        """
+        Retrieve agents by name and type
+
+        Args:
+            name (str): The name of the agents to retrieve.
+            type (str): The type of the agents to retrieve
+
+        Returns:
+            Agents: The agents with the specified name and type
+        """
+        logging.info(f"Retrieving agents by name and type {name}, {type}")
         agents = await self.db_client.retrieve_items_by_values({"name": name, "type": type})
         logging.info(f"Retrieved agents by name and type: {agents}")
         return [Agent(**agent) for agent in agents]
-
 
     async def get_all_agents(self) -> List[Agent]:
         """
@@ -40,7 +58,7 @@ class AgentsRepository:
         logging.info(f"Retrieved {len(agents)} agents.")
         return [Agent(**agent) for agent in agents]
 
-    async def create_agent(self, agent: Agent) -> str:
+    async def create_agent(self, agent: Agent) -> Agent:
         """
         Create an agent.
 
@@ -67,12 +85,16 @@ class AgentsRepository:
         await self.db_client.delete_item(agent_id)
         logging.info(f"Deleted agent: {agent_id}")
     
-    async def update_agent(self, agent_id: str, fields: Dict[str, Any]) -> None:
+    async def update_agent(self, agent_id: str, fields: Dict[str, Any]) -> Agent:
         """
         Update an agent.
 
         Args:
-            agent (Agent): The agent to update.
+            agent_id (str): The ID of the agent to update.
+            fields (Dict[str, Any]): The fields to update.
+        
+        Returns:
+            Agent: The updated agent.
         """
         logging.info(f"Updating agent {agent_id}")
         agent = await self.db_client.retrieve_item_by_id(agent_id, agent_id)
