@@ -12,7 +12,7 @@ logging = get_logger(__name__)
     "/api/v1/admin/agents",
     summary="Get all agents",
     responses={
-        200: {"description": "Agents retrieved successfully"},
+        200: {"description": "Agents Collection"},
         401: {"description": "Unauthorized"},
         500: {"description": "Internal server error"},
     },
@@ -38,9 +38,10 @@ async def get_agents(
     "/api/v1/admin/agents",
     summary="Create an agent",
     responses={
-        201: {"description": "Agent created successfully"},
+        200: {"description": "Agent ID"},
         401: {"description": "Unauthorized"},
         500: {"description": "Internal server error"},
+        400: {"description": "Bad request"},
     },
 )
 async def create_agent(
@@ -58,6 +59,8 @@ async def create_agent(
     try:
         created_agent_id = await agents_service.create_agent(agent, user)
         return created_agent_id
+    except ValueError as ex:
+        raise HTTPException(status_code=400, detail={"description": "Bad request"})
     except Exception as e:
         logging.error(f"Error creating agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -95,9 +98,11 @@ async def delete_agent(
     "/api/v1/admin/agents/{agent_id}",
     summary="Update an agent",
     responses={
-        200: {"description": "Agent updated successfully"},
+        200: {"description": "Agent ID"},
         401: {"description": "Unauthorized"},
         500: {"description": "Internal server error"},
+        400: {"description": "Bad request"},
+
     },
 )
 async def update_agent(
@@ -120,6 +125,8 @@ async def update_agent(
     try:
         updated_agent_id = await agents_service.update_agent(agent_id, agent, user)
         return updated_agent_id
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail={"description": "Bad request"})
     except Exception as e:
         logging.error(f"Error updating agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")

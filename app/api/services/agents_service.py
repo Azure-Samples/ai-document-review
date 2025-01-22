@@ -80,6 +80,10 @@ class AgentsService:
             logging.debug("Updating an agent")
             if not agent_id:
                 raise ValueError("Agent id is required")
+            # Ensure we are not adding a duplicate agent
+            existing_agents = await self.agents_repository.get_agents_by_name_and_type(agent.name, agent.type)
+            if any(a.id != agent_id for a in existing_agents):
+                raise ValueError(f"Agent with name {agent.name} and type {agent.type} already exists")
             update_fields = {
                 "name": agent.name,
                 "type": agent.type,
@@ -89,6 +93,9 @@ class AgentsService:
             }
             updated_agent = await self.agents_repository.update_agent(agent_id, update_fields)
             return updated_agent.id
+        except ValueError as ex:
+            logging.error(f"Another agent with same name and type found.")
+            raise ex
         except Exception as e:
             logging.error(f"Error updating agent: {str(e)}")
             raise e
