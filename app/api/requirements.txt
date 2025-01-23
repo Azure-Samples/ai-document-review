@@ -1,6 +1,6 @@
 fastapi[standard] == 0.112.0
 pydantic==2.8.2
-azure-identity==1.17.1
+azure-identity==1.19.0
 pydantic-settings==2.4.0
 azure-cosmos==4.9.0
 fastapi-azure-auth==5.0.1
