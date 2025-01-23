@@ -15,17 +15,35 @@ class CosmosDBClient:
         self.container = self.database.get_container_client(container_name)
 
 
-    async def store_item(self, item: Dict[str, any]) -> None:
+    async def store_item(self, item: Dict[str, any]) -> Dict[str, any]:
         """
         Store an item in the Cosmos DB container.
 
         :param item: A dictionary representing the item to store. Must contain an 'id' field.
         """
         try:
-            self.container.upsert_item(body=item)
+            item = self.container.upsert_item(body=item)
             logging.info("Item stored successfully.")
+            return item
         except CosmosHttpResponseError as e:
             logging.error(f"An error occurred while storing the item: {e}")
+            raise e
+
+    async def retrieve_items(self) -> Optional[List[Dict[str, Any]]]:
+        """
+        Retrieve all items from the Cosmos DB container.
+
+        :return: A list of all items, or None if an error occurs.
+        """
+        try:
+            items = self.container.query_items(
+                query="SELECT * FROM c",
+                enable_cross_partition_query=True,
+            )
+            items_list = list(items)
+            return items_list
+        except CosmosHttpResponseError as e:
+            logging.error(f"An error occurred while retrieving items: {e}")
             raise e
 
 
@@ -76,3 +94,20 @@ class CosmosDBClient:
         except CosmosHttpResponseError as e:
             logging.error(f"An error occurred while retrieving items: {e}")
             return None
+
+
+    async def delete_item(self, item_id: str) -> None:
+        """
+        Delete an item from the Cosmos DB container by its ID.
+
+        :param item_id: The ID of the item to delete.
+        """
+        try:
+            self.container.delete_item(item=item_id, partition_key=item_id)
+            logging.info(f"Item with ID {item_id} deleted successfully.")
+        except CosmosHttpResponseError as e:
+            if e.status_code == 404:
+                logging.warning(f"Item with ID {item_id} not found.")
+            else:
+                logging.error(f"An error occurred while deleting the item: {e}")
+                raise e
