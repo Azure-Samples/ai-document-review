@@ -1,5 +1,5 @@
 import re
-from pydantic import BaseModel, field_validator, model_validator, root_validator
+from pydantic import BaseModel, field_validator
 from enum import Enum
 from typing import Optional
 
@@ -151,24 +151,24 @@ class UpdateAgent(BaseModel):
 
 def validate_text(value, length_limit):
     """
-    Validate the text value of given field.
-    Check that the field value is not empty, does not exceed the length limit, 
-    and does not contain disallowed special characters.
+    Validate the text value.
+    
+    Ensures that the provided value is not an empty string, adheres to the specified 
+    length limit, and does not include disallowed special characters.
 
     Args:
-        value: The field value to validate.
-        field: The field name.
-        length_limit: The maximum length allowed for the field value.
+        value (str): The field value to validate.
+        length_limit (int): The maximum length allowed for the field value.
 
     Returns:
-        The validated field value.
+        str: The validated field value.
     """
     if not value:
-        raise ValueError(f"Cannot be empty")
+        raise ValueError(f"Value cannot be empty")
     text_length = len(value.strip())
     if text_length == 0 or text_length > length_limit:
-        raise ValueError(f"Must between 1 to {length_limit} characters long.")
+        raise ValueError(f"Value must be between 1 to {length_limit} characters long.")
     disallowed_pattern = r"[^\w\s" + re.escape(allowed_special_characters) + "]"
     if re.search(disallowed_pattern, value):
-        raise ValueError(f"Contains disallowed special characters.")
+        raise ValueError(f"Value contains disallowed special characters.")
     return value

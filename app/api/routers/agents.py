@@ -28,9 +28,10 @@ async def get_agents(
 
     Args:
         user (Depends): The authenticated user.
-    
+        agents_service (Depends): The service to interact with agents.
+
     Returns:
-        List[Agent]: List of all agents.
+        List[Agent]: A list of all agents.
     """
     try:
         agents = await agents_service.get_all_agents()
@@ -38,6 +39,7 @@ async def get_agents(
     except Exception as e:
         logging.error(f"Error retrieving agents: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
 
 @router.post(
     "/api/v1/admin/agents",
@@ -56,14 +58,15 @@ async def create_agent(
     agents_service=Depends(get_agents_service)
 ) -> str:
     """
-    Create an agent.
+    Create a new agent.
 
     Args:
-        agent (CreateAgent): The agent to create.
+        agent (CreateAgent): The agent data to create.
         user (Depends): The authenticated user.
-    
+        agents_service (Depends): The service to interact with agents.
+
     Returns:
-        str: The created agent object.
+        str: The JSON representation of the created agent.
     """
     try:
         created_agent = await agents_service.create_agent(agent, user)
@@ -76,6 +79,7 @@ async def create_agent(
         logging.error(f"Error creating agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+
 @router.delete(
     "/api/v1/admin/agents/{agent_id}",
     summary="Delete an agent",
@@ -87,26 +91,27 @@ async def create_agent(
     status_code=204,  # Explicitly set the response code
 )
 async def delete_agent(
-    agent_id,
+    agent_id: str,
     user=Depends(validate_authenticated),
     agents_service=Depends(get_agents_service)
 ):
     """
-    Delete an agent.
+    Delete an agent by its ID.
 
     Args:
-        agent_id (str): The agent ID to delete.
-        user (Depends): The authenticated.
-    
-    Returns:
-        No Content
+        agent_id (str): The ID of the agent to delete.
+        user (Depends): The authenticated user.
+        agents_service (Depends): The service to interact with agents.
 
+    Returns:
+        None
     """
     try:
         await agents_service.delete_agent(agent_id)
     except Exception as e:
         logging.error(f"Error deleting agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
 
 @router.patch(
     "/api/v1/admin/agents/{agent_id}",
@@ -121,21 +126,22 @@ async def delete_agent(
     },
 )
 async def update_agent(
-    agent_id,
+    agent_id: str,
     agent: UpdateAgent,
     user=Depends(validate_authenticated),
     agents_service=Depends(get_agents_service)
 ):
     """
-    Update an agent.
+    Update an existing agent's data.
 
     Args:
-        agent_id (str): The agent ID to update.
-        agent (UpdateAgent): The agent to update.
+        agent_id (str): The ID of the agent to update.
+        agent (UpdateAgent): The updated data for the agent.
         user (Depends): The authenticated user.
-    
+        agents_service (Depends): The service to interact with agents.
+
     Returns:
-        str: The updated agent.
+        str: The JSON representation of the updated agent.
     """
     try:
         updated_agent = await agents_service.update_agent(agent_id, agent, user)
