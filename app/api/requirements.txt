@@ -8,5 +8,5 @@ marshmallow==3.19.0
 azure-ai-ml==1.19.0
 sseclient-py==1.8.0
 uvicorn[standard]==0.34.0
-opencensus-ext-azure==1.1.13
+opencensus-ext-azure==1.1.14
 opencensus-ext-fastapi==0.1.0
