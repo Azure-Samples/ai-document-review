@@ -1,7 +1,11 @@
-import { makeStyles } from "@fluentui/react-components";
+import { makeStyles, tokens } from "@fluentui/react-components";
 
 // Define common styles
 const useStyles = makeStyles({
+  selected: {
+    backgroundColor: tokens.colorNeutralBackground5,
+    color: tokens.colorNeutralForeground1,
+  },
   container: {
     display: 'flex',
     flexDirection: 'column',

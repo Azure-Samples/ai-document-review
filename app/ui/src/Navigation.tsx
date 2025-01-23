@@ -9,8 +9,6 @@ import {
   MenuGroupHeader,
   MenuDivider,
   Avatar,
-  tokens,
-  makeStyles,
   MenuItemLink,
 } from "@fluentui/react-components";
 import {
@@ -25,6 +23,8 @@ import Agents from "./pages/admin/Agents";
 import Files from "./pages/files/Files";
 import Review from "./pages/review/Review";
 import Settings from "./pages/admin/Settings";
+import useStyles from "./styles/useStyles";
+
 
 // paths
 const paths = {
@@ -34,12 +34,7 @@ const paths = {
   settings: "/admin/settings",
 };
 
-const useStyles = makeStyles({
-  selected: {
-    backgroundColor: tokens.colorNeutralBackground5,
-    color: tokens.colorNeutralForeground1,
-},
-});
+const documentation_url = "https://github.com/Azure-Samples/ai-document-review";
 
 const NavMenu = () => {
   const navigate = useNavigate();
@@ -85,7 +80,7 @@ const NavMenu = () => {
             </MenuItem>
           </MenuGroup>
           <MenuDivider />
-          <MenuItemLink icon={<DocumentBulletListFilled />} href="https://github.com/Azure-Samples/ai-document-review" target="_blank" rel="noopener noreferrer">
+          <MenuItemLink icon={<DocumentBulletListFilled />} href={documentation_url} target="_blank" rel="noopener noreferrer">
             Documentation
           </MenuItemLink>
 
