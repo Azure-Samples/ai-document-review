@@ -19,10 +19,10 @@ import {
   DocumentBulletListFilled,
 } from "@fluentui/react-icons";
 import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
-import Agents from "./pages/admin/Agents";
+import AgentManager from "./pages/admin/AgentManager";
 import Files from "./pages/files/Files";
 import Review from "./pages/review/Review";
-import Settings from "./pages/admin/Settings";
+import SettingManager from "./pages/admin/SettingManager";
 import useStyles from "./styles/useStyles";
 
 
@@ -98,8 +98,8 @@ const Pages = () => (
   <Routes>
     <Route path={paths.home} element={<Files />} />
     <Route path={paths.review} element={<Review />} />
-    <Route path={paths.adminAgents} element={<Agents />} />
-    <Route path={paths.settings} element={<Settings />} />
+    <Route path={paths.adminAgents} element={<AgentManager />} />
+    <Route path={paths.settings} element={<SettingManager />} />
   </Routes>
 );
 
