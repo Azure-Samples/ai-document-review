@@ -1,26 +1,12 @@
-import {
-  Button,
-  Caption1,
-  Card,
-  CardFooter,
-  CardHeader,
-  CardPreview,
-  SkeletonItem,
-  Text,
-} from "@fluentui/react-components";
-import {
-  DeleteRegular,
-  EditRegular,
-  SquareMultipleRegular,
-} from "@fluentui/react-icons";
-import { useState, useEffect, SetStateAction } from "react";
+import { useState, useEffect } from "react";
+import { SkeletonItem } from "@fluentui/react-components";
 import { getAgents, deleteAgent } from "../services/api";
 import AddCard from "./AddCard";
 import AgentDialog from "./AgentDialog";
 import ErrorMessage from "./ErrorMessage";
 import CustomDialog from "./CustomDialog";
 import useStyles from "../styles/useStyles";
-
+import AgentCard from "./AgentCard";
 
 function AgentList() {
   interface Agent {
@@ -31,10 +17,10 @@ function AgentList() {
     created_at_UTC?: string;
     updated_at_UTC?: string;
   }
-  
+
   const [agents, setAgents] = useState<Agent[]>([]);
   const [showDialog, setShowDialog] = useState(false);
-  const [agentInFocus, setAgentInFocus] = useState({
+  const [agentInFocus, setAgentInFocus] = useState<Agent>({
     id: "",
     name: "",
     guideline_prompt: "",
@@ -50,13 +36,13 @@ function AgentList() {
     async function fetchAgents() {
       try {
         const data = await getAgents();
-      if (data.length === 0) setAgentLoadError("No agents found.");
-      setAgents(data);
-    } catch {
-      setAgentLoadError("There was an issue retrieving agents.");
+        if (data.length === 0) setAgentLoadError("No agents found.");
+        setAgents(data);
+      } catch {
+        setAgentLoadError("There was an issue retrieving agents.");
+      }
     }
-  }
-  fetchAgents();
+    fetchAgents();
   }, []);
 
   const updateAgentList = (newAgent: Agent) => {
@@ -84,50 +70,28 @@ function AgentList() {
     setShowDialog(true);
   };
 
-  const handleViewAgent = (agent: SetStateAction<{ id: string; name: string; guideline_prompt: string; type: string; }>) => {
-    console.log("Here");
-    console.log(agent);
+  const handleViewAgent = (agent: Agent) => {
     setAgentInFocus(agent);
     setMode("view");
     setShowDialog(true);
   };
 
-  const extractDate = (dateString: string | number | Date | undefined) => {
-    const date = new Date(dateString);
-    if (!isNaN(date.getTime())) {
-      return date.toLocaleDateString();
-    } else {
-      return "";
-    }
-  };
-
-  const handleDeleteAgent = (id: SetStateAction<string>) => (e: { stopPropagation: () => void; }) => {
-    e.stopPropagation();
+  const handleDeleteAgent = (id: string) => {
     setAgentToBeDeleted(id);
   };
 
-  const handleEditAgent = (id: string) => (e: { stopPropagation: () => void; }) => {
-    e.stopPropagation();
+  const handleEditAgent = (id: string) => {
     const agentToEdit = agents.find((a) => a.id === id);
-    if (agentToEdit) {
-      setAgentInFocus(agentToEdit);
-    }
+    if (agentToEdit) setAgentInFocus(agentToEdit);
     setMode("edit");
     setShowDialog(true);
   };
 
-  const handleDuplicateAgent = (id: string) => (e: { stopPropagation: () => void; }) => {
-    e.stopPropagation();
+  const handleDuplicateAgent = (id: string) => {
     const agentToDuplicate = agents.find((a) => a.id === id);
-    if (agentToDuplicate) {
-      setAgentInFocus(agentToDuplicate);
-    }
+    if (agentToDuplicate) setAgentInFocus(agentToDuplicate);
     setMode("duplicate");
     setShowDialog(true);
-  };
-
-  const onErrorClose = () => {
-    console.log("Error message closed");
   };
 
   return (
@@ -137,7 +101,7 @@ function AgentList() {
           <ErrorMessage
             title="Error loading agents"
             message={agentLoadError}
-            onClose={onErrorClose}
+            onClose={() => setAgentLoadError("")}
           />
         )}
         <div className={classes.row}>
@@ -147,43 +111,15 @@ function AgentList() {
                 <SkeletonItem key={i} className={classes.card} />
               ))
             : agents.map((agent) => (
-                <Card
-                  onClick={() => {
-                    handleViewAgent(agent);
-                  }}
+                <AgentCard
                   key={agent.id}
-                  className={classes.card}
-                >
-                  <CardHeader
-                    header={<Text weight="semibold">{agent.name}</Text>}
-                    description={
-                      <Caption1 className={classes.caption}>
-                        {agent.updated_at_UTC && agent.updated_at_UTC !== ""
-                          ? "Updated: " + extractDate(agent.updated_at_UTC)
-                          : "Created: " + extractDate(agent.created_at_UTC)}
-                      </Caption1>
-                    }
-                  />
-                  <CardPreview>
-                    <Text className={classes.cardbody}>
-                      {agent.guideline_prompt}
-                    </Text>
-                  </CardPreview>
-                  <CardFooter>
-                    <Button
-                      onClick={handleDeleteAgent(agent.id)}
-                      icon={<DeleteRegular />}
-                    />
-                    <Button
-                      onClick={handleEditAgent(agent.id)}
-                      icon={<EditRegular />}
-                    />
-                    <Button
-                      onClick={handleDuplicateAgent(agent.id)}
-                      icon={<SquareMultipleRegular />}
-                    />
-                  </CardFooter>
-                </Card>
+                  agent={agent}
+                  classes={classes}
+                  onViewAgent={handleViewAgent}
+                  onDeleteAgent={handleDeleteAgent}
+                  onEditAgent={handleEditAgent}
+                  onDuplicateAgent={handleDuplicateAgent}
+                />
               ))}
         </div>
       </div>
@@ -197,14 +133,10 @@ function AgentList() {
           updateAgentList={updateAgentList}
         />
       )}
-      {agentToBeDeleted !== "" && (
+      {agentToBeDeleted && (
         <CustomDialog
-          isOpen={agentToBeDeleted !== ""}
-          title={
-            "Delete Agent '" +
-            agents.find((agent) => agent.id === agentToBeDeleted)?.name +
-            "'"
-          }
+          isOpen={!!agentToBeDeleted}
+          title={`Delete Agent '${agents.find((a) => a.id === agentToBeDeleted)?.name}'`}
           message="Are you sure you want to delete this agent?"
           onConfirm={() => handleDeleteConfirmation(agentToBeDeleted)}
           onCancel={() => setAgentToBeDeleted("")}
