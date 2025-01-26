@@ -5,7 +5,6 @@ import {
   CardFooter,
   CardHeader,
   CardPreview,
-  Divider,
   SkeletonItem,
   Text,
 } from "@fluentui/react-components";
@@ -15,7 +14,6 @@ import {
   SquareMultipleRegular,
 } from "@fluentui/react-icons";
 import { useState, useEffect, SetStateAction } from "react";
-import aiDocIcon from "../assets/ai-doc.png";
 import { getAgents, deleteAgent } from "../services/api";
 import AddCard from "./AddCard";
 import AgentDialog from "./AgentDialog";
@@ -87,6 +85,8 @@ function AgentList() {
   };
 
   const handleViewAgent = (agent: SetStateAction<{ id: string; name: string; guideline_prompt: string; type: string; }>) => {
+    console.log("Here");
+    console.log(agent);
     setAgentInFocus(agent);
     setMode("view");
     setShowDialog(true);
@@ -189,10 +189,11 @@ function AgentList() {
       </div>
       {showDialog && (
         <AgentDialog
+          agent_id={agentInFocus.id}
+          handleCloseDialog={handleCloseDialog}
+          selectedAgent={agentInFocus}
           showDialog={showDialog}
-          onClose={handleCloseDialog}
           mode={mode}
-          agent={agentInFocus}
           updateAgentList={updateAgentList}
         />
       )}

@@ -12,7 +12,7 @@ function AgentManager() {
 
   const [agents, setAgents] = useState([]);
   const [showDialog, setShowDialog] = useState(false);
-  const [agentInFocus, setAgentInFocus] = useState({});
+  const [agentInFocus, setAgentInFocus] = useState({id: '', name: '', guideline_prompt: '', type: ''});
   const [mode, setMode] = useState<'view' | 'edit' | 'add' | 'duplicate'>('view');
   const [agentToBeDeleted, setAgentToBeDeleted] = useState('');
 
@@ -30,13 +30,13 @@ function AgentManager() {
 
   // Handlers
   const handleAddNewAgent = () => {
-    setAgentInFocus({ name: '', guideline_prompt: '', type: '' });
+    setAgentInFocus({ id: '', name: '', guideline_prompt: '', type: '' });
     setMode('add');
     setShowDialog(true);
   };
 
   const handleCloseDialog = () => {
-    setAgentInFocus({});
+    setAgentInFocus({ id: '', name: '', guideline_prompt: '', type: '' });
     setShowDialog(false);
   };
 
@@ -101,27 +101,6 @@ function AgentManager() {
           onDuplicateAgent={handleDuplicateAgent}
         />
       </div>
-
-      {/* Dialogs */}
-      {showDialog && (
-        <AgentDialog
-          localAgent={agentInFocus}
-          mode={mode}
-          showDialog={showDialog}
-          onClose={handleCloseDialog}
-          updateAgentList={(newAgent) => setAgents((prev) => [...prev, newAgent])}
-        />
-      )}
-
-      {agentToBeDeleted && (
-        <CustomDialog
-          isOpen={!!agentToBeDeleted}
-          title={`Delete Agent '${agents.find((agent) => agent.id === agentToBeDeleted)?.name}'`}
-          message="Are you sure you want to delete this agent?"
-          onConfirm={handleDeleteConfirmation}
-          onCancel={() => setAgentToBeDeleted('')}
-        />
-      )}
     </div>
   );
 }
