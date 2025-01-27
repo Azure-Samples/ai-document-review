@@ -1,5 +1,6 @@
-import { Button, MessageBar, MessageBarBody, MessageBarTitle } from "@fluentui/react-components"
+import { Button, MessageBar, MessageBarBody, MessageBarTitle } from "@fluentui/react-components";
 import { DismissRegular } from "@fluentui/react-icons";
+import useStyles from "../styles/useStyles";
 
 interface ErrorMessageProps {
     title: string;
@@ -8,20 +9,23 @@ interface ErrorMessageProps {
 }
 
 const ErrorMessage = ({ title, message, onClose }: ErrorMessageProps) => {
+    const classes = useStyles();
     return (
         <MessageBar intent="error">
-            {/* TODO: Move button to end of the error message box instead of top right corner of the modal */}
-            <Button
-                style={{ position: 'absolute', right: '0.5rem', top: '0.5rem' }}
-                icon={<DismissRegular />}
-                onClick={onClose}
-            />
-            <MessageBarBody>
-                <MessageBarTitle>{title}</MessageBarTitle>
-                {message}
-            </MessageBarBody>
+            <div className={classes.messageBar}>
+                <MessageBarBody style={{ flexGrow: 1 }}>
+                    <MessageBarTitle>{title}</MessageBarTitle>
+                    {message}
+                </MessageBarBody>
+                <Button
+                    icon={<DismissRegular />}
+                    onClick={onClose}
+                    appearance="subtle"
+                    style={{ marginLeft: '1rem' }}
+                />
+            </div>
         </MessageBar>
-    )
-}
+    );
+};
 
-export default ErrorMessage
+export default ErrorMessage;

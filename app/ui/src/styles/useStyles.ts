@@ -6,6 +6,12 @@ const flex = {
 }
 
 const useStyles = makeStyles({
+  messageBar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%'
+  },
   root: {
     display: 'flex',
     flexDirection: 'column',
