@@ -227,20 +227,14 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
             </div>
           </DialogContent>
           <DialogActions className={classes.bottomLeftButtonContainer}>
-            {mode !== 'view' && !loading && (
-              <Button
-                disabled={hasError}
-                appearance="primary"
-                size="large"
-                icon={<SaveRegular />}
-                iconPosition="after"
-                className={classes.applyButton}
-                onClick={handleSave}
-              >
-                Apply
-              </Button>
-            )}
-            {loading && <Spinner labelPosition="below" appearance="primary" label="Saving..." />}
+            <Button
+              onClick={handleSave}
+              appearance="primary"
+              disabled={loading || hasError}
+              icon={loading ? <Spinner size="tiny" /> : <SaveRegular />} 
+            >
+              {loading ? "Saving..." : "Apply"}
+            </Button>
           </DialogActions>
         </DialogBody>
       </DialogSurface>
