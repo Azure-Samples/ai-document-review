@@ -144,6 +144,7 @@ cython_debug/
 **/terraform.tfstate
 **/terraform.tfstate.backup
 **/local.tfvars
+**/main.tfvars.json
 **/bootstrap.tfvars
 
 # Logs

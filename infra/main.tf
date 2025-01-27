@@ -295,7 +295,9 @@ resource "azurerm_linux_web_app" "main" {
     "LOG_LEVEL"                       = "INFO"
   }
 
-  tags = merge(local.common_tags, {})
+  tags = merge(local.common_tags, {
+    "azd-service-name": "app"
+  })
 }
 
 resource "azurerm_application_insights" "main" {

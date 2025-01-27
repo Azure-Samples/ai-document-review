@@ -1,8 +1,0 @@
-subscription_id = "" // Azure subscription ID to deploy to
-environment     = "" // Environment name (e.g. personal, dev, staging, prod)
-name            = "adr" // Deployment name (to ensure uniqueness)
-location        = "" // Azure region for resources
-
-ml_engineers = [] // List of Entra ID user/group object IDs to grant access to the deployed ML resources
-
-// See infra/variables.tf for all variables that can be set

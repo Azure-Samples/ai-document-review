@@ -1,0 +1,8 @@
+{
+  "subscription_id": "",
+  "environment": "dev",
+  "name": "<UNIQUE_NAME>",
+  "location": "westeurope",
+  "gpt_model_capacity": "400",
+  "ml_engineers": []
+}
