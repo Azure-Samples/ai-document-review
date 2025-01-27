@@ -10,12 +10,17 @@ services:
     project: app/api
     host: appservice
     language: python
+    dist: ../dist
     hooks:
-      # Build the UI code into the API's www directory.
       prepackage:
-        shell: sh
-        run: 'task app-build-ui'
-  flows:
-    project: flows
-    host: appservice
-    language: python
+        # Build the UI code into the API's www directory.
+        - shell: sh
+          run: 'task app-build-ui'
+        - shell: sh
+          # Replace symlink with actual files so azd package works
+          run: rsync . ../dist -a --copy-links -v --exclude .venv
+  # Add when flows appservice PR is merged
+  # flows:
+  #   project: flows
+  #   host: appservice
+  #   language: python
