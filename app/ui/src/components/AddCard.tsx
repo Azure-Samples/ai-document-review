@@ -8,10 +8,18 @@ interface AddCardProps {
 }
 
 const AddCard: React.FC<AddCardProps> = ({ onClick, labelText }) => {
-  const classes = useStyles()
+  const classes: Record<string, string> = useStyles()
+
+  const handleClick = onClick || (() => {})
 
   return (
-    <Card className={classes.disabledCard} appearance="filled-alternative" onClick={onClick}>
+    <Card 
+      aria-label={labelText}
+      role="button"
+      className={classes.disabledCard} 
+      appearance="filled-alternative" 
+      onClick={handleClick}
+    >
       <AddRegular className={classes.addIcon} />
       <Text className={classes.addIconText}>
         {labelText}

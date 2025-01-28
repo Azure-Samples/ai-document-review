@@ -6,6 +6,12 @@ const flex = {
 }
 
 const useStyles = makeStyles({
+  cardFooter: {
+    marginTop: "auto",
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "8px"
+  },
   largeViewModeText: {
     width: '170%',
     whiteSpace: 'pre-wrap',
@@ -151,8 +157,8 @@ const useStyles = makeStyles({
   },
   smallRadius: { borderRadius: tokens.borderRadiusSmall },
   addIconText: {
-    textAlign: 'center', // Ensure text is centered
-    fontWeight: tokens.fontWeightSemibold, // Apply semibold weight if needed
+    textAlign: 'center',
+    fontWeight: tokens.fontWeightSemibold,
   },
   addIcon: {
     fontSize: '72px',

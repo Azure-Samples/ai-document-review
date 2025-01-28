@@ -13,41 +13,59 @@ interface CustomDialogProps {
   isOpen: boolean;
   title: string;
   message: string;
-  onConfirm: () => Promise<void>; // Ensure onConfirm returns a Promise
+  onConfirm: () => Promise<void>;
   onCancel: () => void;
 }
 
-const CustomDialog: React.FC<CustomDialogProps> = ({ isOpen, title, message, onConfirm, onCancel }) => {
-  const [isLoading, setIsLoading] = useState(false); // Track loading state
+const CustomDialog: React.FC<CustomDialogProps> = ({
+  isOpen,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleConfirm = async () => {
     setIsLoading(true);
+    setErrorMessage(null);
     try {
-      await onConfirm(); // Await the deletion operation
+      await onConfirm();
     } catch (error) {
-      console.error("Error during deletion:", error);
+      console.error("Error during operation:", error);
+      setErrorMessage("An error occurred. Please try again.");
     } finally {
-      setIsLoading(false); // Hide loading spinner after operation
+      setIsLoading(false);
     }
   };
 
+  const handleCancel = () => {
+    setErrorMessage(null);
+    setIsLoading(false); 
+    onCancel();
+  };
+
   return (
-    <Dialog open={isOpen}>
+    <Dialog aria-labelledby="custom-dialog-title" open={isOpen}>
       <DialogSurface>
         <DialogBody>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle id="custom-dialog-title">{title}</DialogTitle>
           <p>{message}</p>
+
+          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+
           <DialogActions>
-            <Button onClick={onCancel} appearance="secondary" disabled={isLoading}>
+            <Button onClick={handleCancel} appearance="secondary" disabled={isLoading}>
               Cancel
             </Button>
             <Button
               onClick={handleConfirm}
               appearance="primary"
-              disabled={isLoading} // Disable button when loading
-              icon={isLoading ? <Spinner size="tiny" /> : undefined} // Show spinner when loading
+              disabled={isLoading}
+              icon={isLoading ? <Spinner size="tiny" /> : undefined}
             >
-              {isLoading ? "Deleting..." : "Confirm"}
+              {isLoading ? "Processing..." : "Confirm"}
             </Button>
           </DialogActions>
         </DialogBody>

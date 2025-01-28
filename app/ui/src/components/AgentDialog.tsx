@@ -8,7 +8,6 @@ import {
   DialogContent,
   Input,
   Textarea,
-  Label,
   Divider,
   DialogActions,
   Field,
@@ -19,7 +18,7 @@ import { CopyRegular, DismissRegular, EditRegular, SaveRegular } from '@fluentui
 import { addAgent, updateAgent } from '../services/api'
 import ErrorMessage from './ErrorMessage'
 import useStyles from '../styles/useStyles'
-import { PLACEHOLDER_AGENT_GUIDELINE, PLACEHOLDER_AGENT_GUIDELINE_PROMPT, PLACEHOLDER_AGENT_NAME, PLACEHOLDER_AGENT_TYPE } from '../constants'
+import { PLACEHOLDER_AGENT_GUIDELINE_PROMPT, PLACEHOLDER_AGENT_NAME, PLACEHOLDER_AGENT_TYPE } from '../constants'
 
 interface AgentDialogProps {
   agentId: string
@@ -87,7 +86,6 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
         [field]: value
       }))
 
-      // Validate input immediately
       const error = hasErrorInInput(value, field === 'guideline_prompt' ? 5000 : 50)
       if (field === 'name') setNameInputError(error)
       if (field === 'type') setTypeInputError(error)

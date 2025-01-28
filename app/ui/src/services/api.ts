@@ -189,7 +189,7 @@ export async function deleteAgent(id: string) {
   try {
     const response = await callApi(`${agentsPath}/${id}`, 'DELETE');
     if (response.status === 204) {
-      return { message: 'Agent deleted successfully' }; // No content is expected on a 204 status.
+      return { message: 'Agent deleted successfully' };
     }
     const errorData = await response.json();
     throw new Error(errorData.detail || 'Failed to delete agent.');
