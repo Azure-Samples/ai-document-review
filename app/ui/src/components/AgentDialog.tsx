@@ -12,27 +12,27 @@ import {
   Divider,
   DialogActions,
   Field,
-  Spinner
+  Spinner,
+  Tooltip
 } from '@fluentui/react-components'
-import { DismissRegular, SaveRegular } from '@fluentui/react-icons'
+import { CopyRegular, DismissRegular, EditRegular, SaveRegular } from '@fluentui/react-icons'
 import { addAgent, updateAgent } from '../services/api'
 import ErrorMessage from './ErrorMessage'
 import useStyles from '../styles/useStyles'
+import { PLACEHOLDER_AGENT_GUIDELINE, PLACEHOLDER_AGENT_GUIDELINE_PROMPT, PLACEHOLDER_AGENT_NAME, PLACEHOLDER_AGENT_TYPE } from '../constants'
 
 interface AgentDialogProps {
-  agent_id: string
+  agentId: string
   handleCloseDialog: () => void
-  selectedAgent: { id: string;  type: string; name: string; guideline_prompt: string }
+  selectedAgent: { id: string; type: string; name: string; guideline_prompt: string }
   showDialog: boolean
   setShowDialog: (open: boolean) => void
   mode: 'view' | 'edit' | 'add' | 'duplicate'
-  updateAgentList?: (
-    agents: { id: string; type: string; name: string; guideline_prompt: string }[]
-  ) => void
+  updateAgentList?: () => void
 }
 
 const AgentDialog: React.FC<AgentDialogProps> = ({
-  agent_id,
+  agentId,
   handleCloseDialog,
   selectedAgent,
   showDialog,
@@ -41,32 +41,42 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
   updateAgentList
 }) => {
   const [localAgent, setLocalAgent] = useState(selectedAgent)
-  const [localAgentId, setLocalAgentId] = useState(agent_id)
+  const [localAgentId, setLocalAgentId] = useState(agentId)
   const [nameInputError, setNameInputError] = useState('')
   const [typeInputError, setTypeInputError] = useState('')
   const [promptInputError, setPromptInputError] = useState('')
   const [hasError, setHasError] = useState(true)
+  const [hasClientSideError, setHasClientSideError] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [isReadOnly, setIsReadOnly] = useState(mode === 'view')
   const [localMode, setLocalMode] = useState(mode)
+  const [isReadOnly, setIsReadOnly] = useState(localMode === 'view')
+
 
   const classes = useStyles()
 
   useEffect(() => {
-    setIsReadOnly(mode === 'view')
-  }, [localMode, mode])
+    setIsReadOnly(localMode === 'view')
+  }, [localMode])
 
   useEffect(() => {
     setHasError(!!nameInputError || !!typeInputError || !!promptInputError)
+    setHasClientSideError(!!nameInputError || !!typeInputError || !!promptInputError)
   }, [nameInputError, typeInputError, promptInputError])
 
   useEffect(() => {
     if (showDialog) {
-      setLocalAgentId(agent_id)
+      setLocalAgentId(agentId)
       setLocalAgent(selectedAgent)
     }
-  }, [showDialog, selectedAgent, agent_id])
+  }, [showDialog, selectedAgent, agentId])
+
+  const dialogTitles: { [key: string]: string } = {
+    view: 'View Agent',
+    edit: 'Edit Agent',
+    duplicate: 'Duplicate Agent',
+    add: 'Add Agent',
+  };
 
   const handleInputChange =
     (field: 'name' | 'type' | 'guideline_prompt') =>
@@ -107,7 +117,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     id: string,
     agent: { name: string; guideline_prompt: string; type: string }
   ) => {
-    if (mode === 'add' || mode === 'duplicate') {
+    if (localMode === 'add' || localMode === 'duplicate') {
       return addAgent(agent)
     } else {
       return updateAgent(id, agent)
@@ -123,9 +133,8 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     if (!hasError && !!localAgent.name && !!localAgent.type && !!localAgent.guideline_prompt) {
       try {
         const response = await callApi(localAgentId, localAgent)
-        console.log('Agent added successfully:', response)
-        if (response && response !== 'Error' && updateAgentList) {
-          // updateAgentList(response)
+        if (response && updateAgentList) {
+          updateAgentList()
           handleCloseDialog()
           setLoading(false)
           // TODO: remove this and fix updateAgentList
@@ -157,6 +166,10 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     setError('')
   }
 
+  const handleEdit = () => {
+    setLocalMode('edit')
+  }
+
   return (
     <Dialog
       open={showDialog}
@@ -169,13 +182,18 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
       <DialogSurface className={classes.dialogSurface}>
         <DialogBody>
           <DialogTitle>
-            {mode === 'view'
-              ? 'View Agent'
-              : mode === 'edit'
-              ? 'Edit Agent'
-              : mode === 'duplicate'
-              ? 'Duplicate Agent'
-              : 'Add Agent'}
+            {dialogTitles[localMode] || 'Agent'}
+            {localMode == "view" &&
+              <Tooltip content="Edit Agent" relationship="label">
+                <Button
+                style={{margin: '10px'}}
+                onClick={handleEdit}
+                appearance="secondary"
+                icon={<EditRegular />}
+              >
+                </Button>
+              </Tooltip>
+            }
           </DialogTitle>
           <Button
             className={classes.closeButton}
@@ -189,52 +207,89 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
             )}
             <Divider className={classes.divider} />
             <div className={classes.root}>
-              <Label htmlFor="agent-name">Name</Label>
-              <Input
-                id="agent-name"
-                placeholder="Agent Name"
-                onChange={handleInputChange('name')}
-                readOnly={isReadOnly}
-                value={localAgent.name}
-                disabled={loading}
-              />
-              {nameInputError && <Field validationMessage={'Name ' + nameInputError}></Field>}
+              <Field required={localMode!= "view"} label="Name">
+              {localMode === 'view' ? (
+                <div id="agent-name" className={classes.viewModeText}>
+                  {localAgent.name}
+                </div>
+              ) : (
+                <Input
+                  id="agent-name"
+                  required
+                  placeholder={PLACEHOLDER_AGENT_NAME}
+                  onChange={handleInputChange('name')}
+                  readOnly={isReadOnly}
+                  value={localAgent.name}
+                  disabled={loading}
+                />
+              )}
+                {nameInputError && <Field validationMessage={'Name ' + nameInputError}></Field>}
+              </Field>
             </div>
             <div className={classes.root}>
-              <Label htmlFor="agent-type">Type</Label>
-              <Input
-                id="agent-type"
-                placeholder="Agent Type"
-                onChange={handleInputChange('type')}
-                value={localAgent.type}
-                readOnly={isReadOnly}
-                disabled={loading}
-              />
-              {typeInputError && <Field validationMessage={'Type ' + typeInputError}></Field>}
+              <Field required={localMode!= "view"} label="Type">
+              {localMode === 'view' ? (
+                <div id="agent-type" className={classes.viewModeText}>
+                  {localAgent.type}
+                </div>
+              ) : (
+                <Input
+                  id="agent-type"
+                  placeholder={PLACEHOLDER_AGENT_TYPE}
+                  onChange={handleInputChange('type')}
+                  value={localAgent.type}
+                  readOnly={isReadOnly}
+                  disabled={loading}
+                />
+              )}
+                {typeInputError && <Field validationMessage={'Type ' + typeInputError}></Field>}
+              </Field>
             </div>
             <div className={classes.root}>
-              <Label htmlFor="agent-prompt">Prompt</Label>
-              <Textarea
-                className={classes.largeTextArea}
-                id="agent-prompt"
-                placeholder="Prompt Text"
-                onChange={handleInputChange('guideline_prompt')}
-                value={localAgent.guideline_prompt}
-                readOnly={isReadOnly}
-                disabled={loading}
-              />
-              {promptInputError && <Field validationMessage={'Prompt ' + promptInputError}></Field>}
+             <Field required={localMode!= "view"} label="Prompt">
+              {localMode === 'view' ? (
+                <div id="agent-prompt" className={classes.largeViewModeText} style={{ position: 'relative' }}>
+                  <Tooltip content="Copy Prompt" relationship="label">
+                  <Button
+                    icon={<CopyRegular />}
+                    onClick={() => navigator.clipboard.writeText(localAgent.guideline_prompt)}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      margin: '5px',
+                    }}
+                    />
+                  </Tooltip>
+                  <div>{localAgent.guideline_prompt}</div>
+                </div>
+
+              ) : (
+                <Textarea
+                  className={classes.largeTextArea}
+                  id="agent-prompt"
+                  required
+                  placeholder={PLACEHOLDER_AGENT_GUIDELINE_PROMPT}
+                  onChange={handleInputChange('guideline_prompt')}
+                  value={localAgent.guideline_prompt}
+                  readOnly={isReadOnly}
+                  disabled={loading}
+                />
+              )}
+                {promptInputError && <Field validationMessage={'Prompt ' + promptInputError}></Field>}
+              </Field>
             </div>
           </DialogContent>
           <DialogActions className={classes.bottomLeftButtonContainer}>
-            <Button
+            { localMode!= "view" && <Button
               onClick={handleSave}
               appearance="primary"
-              disabled={loading || hasError}
-              icon={loading ? <Spinner size="tiny" /> : <SaveRegular />} 
+              disabled={loading || hasClientSideError}
+              icon={loading ? <Spinner size="tiny" /> : <SaveRegular />}
             >
-              {loading ? "Saving..." : "Apply"}
+                {loading ? 'Saving...' : 'Apply'}
             </Button>
+            }
           </DialogActions>
         </DialogBody>
       </DialogSurface>

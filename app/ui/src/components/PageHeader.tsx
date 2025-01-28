@@ -6,9 +6,10 @@ import useStyles from "../styles/useStyles";
 interface PageHeaderProps {
   title: string;
   description: string;
+  customElement?: React.ReactNode;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, description }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ title, description, customElement }) => {
   const classes = useStyles();
 
   return (
@@ -20,6 +21,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, description }) => {
         <div>
           <h2>{title}</h2>
           <p>{description}</p>
+          {customElement && <div>{customElement}</div>}
         </div>
       </div>
     </div>

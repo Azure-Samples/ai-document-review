@@ -8,7 +8,6 @@ import {
   MenuGroup,
   MenuGroupHeader,
   MenuDivider,
-  Avatar,
   MenuItemLink,
 } from "@fluentui/react-components";
 import {
@@ -24,6 +23,7 @@ import Files from "./pages/files/Files";
 import Review from "./pages/review/Review";
 import SettingManager from "./pages/admin/SettingManager";
 import useStyles from "./styles/useStyles";
+import { DOCUMENTATION_URL } from "./constants";
 
 
 // paths
@@ -34,7 +34,6 @@ const paths = {
   settings: "/admin/settings",
 };
 
-const documentation_url = "https://github.com/Azure-Samples/ai-document-review";
 
 const NavMenu = () => {
   const navigate = useNavigate();
@@ -80,14 +79,9 @@ const NavMenu = () => {
             </MenuItem>
           </MenuGroup>
           <MenuDivider />
-          <MenuItemLink icon={<DocumentBulletListFilled />} href={documentation_url} target="_blank" rel="noopener noreferrer">
+          <MenuItemLink icon={<DocumentBulletListFilled />} href={DOCUMENTATION_URL} target="_blank" rel="noopener noreferrer">
             Documentation
           </MenuItemLink>
-
-          {/* Account */}
-          <MenuItem>
-            <Avatar aria-label="User" size={32} />
-          </MenuItem>
         </MenuList>
       </MenuPopover>
     </Menu>

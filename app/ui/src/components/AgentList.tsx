@@ -45,8 +45,8 @@ function AgentList() {
     fetchAgents();
   }, []);
 
-  const updateAgentList = (newAgent: Agent) => {
-    setAgents((prevAgents) => [...prevAgents, newAgent]);
+  const updateAgentList = () => {
+    setAgents([])
   };
 
   const handleDeleteConfirmation = async (id: string) => {
@@ -89,6 +89,7 @@ function AgentList() {
 
   const handleDuplicateAgent = (id: string) => {
     const agentToDuplicate = agents.find((a) => a.id === id);
+    agentInFocus.name = `${agentInFocus.name} (copy)`;
     if (agentToDuplicate) setAgentInFocus(agentToDuplicate);
     setMode("duplicate");
     setShowDialog(true);
@@ -101,15 +102,13 @@ function AgentList() {
           <ErrorMessage
             title="Error loading agents"
             message={agentLoadError}
-            onClose={() => setAgentLoadError("")}
+            onClose={() => setAgentLoadError('')}
           />
         )}
         <div className={classes.row}>
-          <AddCard onClick={handleAddNewAgent} label_text="Add new agent" />
+          <AddCard onClick={handleAddNewAgent} labelText="Add new agent" />
           {agents.length === 0
-            ? Array.from({ length: 2 }, (_, i) => (
-                <SkeletonItem key={i} className={classes.card} />
-              ))
+            ? Array.from({ length: 2 }, (_, i) => <SkeletonItem key={i} className={classes.card} />)
             : agents.map((agent) => (
                 <AgentCard
                   key={agent.id}
@@ -125,7 +124,7 @@ function AgentList() {
       </div>
       {showDialog && (
         <AgentDialog
-          agent_id={agentInFocus.id}
+          agentId={agentInFocus.id}
           handleCloseDialog={handleCloseDialog}
           selectedAgent={agentInFocus}
           showDialog={showDialog}
@@ -139,11 +138,11 @@ function AgentList() {
           title={`Delete Agent '${agents.find((a) => a.id === agentToBeDeleted)?.name}'`}
           message="Are you sure you want to delete this agent?"
           onConfirm={() => handleDeleteConfirmation(agentToBeDeleted)}
-          onCancel={() => setAgentToBeDeleted("")}
+          onCancel={() => setAgentToBeDeleted('')}
         />
       )}
     </div>
-  );
+  )
 }
 
 export default AgentList;

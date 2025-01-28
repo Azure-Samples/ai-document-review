@@ -67,9 +67,6 @@ const AgentCard: React.FC<AgentCardProps> = ({
         <Tooltip content="Delete Agent" relationship="label">
           <Button onClick={(e) => { e.stopPropagation(); onDeleteAgent(agent.id); }} icon={<DeleteRegular />} />
         </Tooltip>
-        <Tooltip content="Edit Agent" relationship="label">
-          <Button onClick={(e) => { e.stopPropagation(); onEditAgent(agent.id); }} icon={<EditRegular />} />
-        </Tooltip>
         <Tooltip content="Duplicate Agent" relationship="label">
           <Button onClick={(e) => { e.stopPropagation(); onDuplicateAgent(agent.id); }} icon={<SquareMultipleRegular />} />
         </Tooltip>

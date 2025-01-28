@@ -6,6 +6,22 @@ const flex = {
 }
 
 const useStyles = makeStyles({
+  largeViewModeText: {
+    width: '170%',
+    whiteSpace: 'pre-wrap',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    padding: '5px',
+    marginTop: '2px',
+    marginBottom: '8px',
+    height: '250px',
+    overflowY: 'auto',
+  },
+  viewModeText: {
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    padding: '5px',
+  },
   messageBar: {
     display: 'flex',
     alignItems: 'center',

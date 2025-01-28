@@ -4,17 +4,17 @@ import useStyles from '../styles/useStyles'
 
 interface AddCardProps {
   onClick: () => void
-  label_text: string
+  labelText: string
 }
 
-const AddCard: React.FC<AddCardProps> = ({ onClick, label_text }) => {
+const AddCard: React.FC<AddCardProps> = ({ onClick, labelText }) => {
   const classes = useStyles()
 
   return (
     <Card className={classes.disabledCard} appearance="filled-alternative" onClick={onClick}>
       <AddRegular className={classes.addIcon} />
       <Text className={classes.addIconText}>
-        {label_text}
+        {labelText}
       </Text>
     </Card>
   )
