@@ -32,21 +32,22 @@ function AgentList() {
 
   const classes = useStyles();
 
-  useEffect(() => {
-    async function fetchAgents() {
-      try {
-        const data = await getAgents();
-        if (data.length === 0) setAgentLoadError("No agents found.");
-        setAgents(data);
-      } catch {
-        setAgentLoadError("There was an issue retrieving agents.");
-      }
+  async function fetchAgents() {
+    try {
+      const data = await getAgents();
+      if (data.length === 0) setAgentLoadError("No agents found.");
+      setAgents(data);
+    } catch {
+      setAgentLoadError("There was an issue retrieving agents.");
     }
+  }
+
+  useEffect(() => {
     fetchAgents();
   }, []);
 
-  const updateAgentList = () => {
-    setAgents([])
+  const updateAgentList = async () => {
+    await fetchAgents();
   };
 
   const handleDeleteConfirmation = async (id: string) => {
@@ -89,10 +90,12 @@ function AgentList() {
 
   const handleDuplicateAgent = (id: string) => {
     const agentToDuplicate = agents.find((a) => a.id === id);
-    agentInFocus.name = `${agentInFocus.name} (copy)`;
-    if (agentToDuplicate) setAgentInFocus(agentToDuplicate);
-    setMode("duplicate");
-    setShowDialog(true);
+    if (agentToDuplicate) {
+      const duplicatedAgent = { ...agentToDuplicate, name: `${agentToDuplicate.name} (copy)` };
+      setAgentInFocus(duplicatedAgent);
+      setMode("duplicate");
+      setShowDialog(true);
+    }
   };
 
   return (
@@ -128,6 +131,7 @@ function AgentList() {
           handleCloseDialog={handleCloseDialog}
           selectedAgent={agentInFocus}
           showDialog={showDialog}
+          setShowDialog={setShowDialog}
           mode={mode}
           updateAgentList={updateAgentList}
         />

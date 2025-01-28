@@ -130,15 +130,13 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     setTypeInputError(hasErrorInInput(localAgent.type, 50))
     setPromptInputError(hasErrorInInput(localAgent.guideline_prompt, 5000))
 
-    if (!hasError && !!localAgent.name && !!localAgent.type && !!localAgent.guideline_prompt) {
+    if (!hasClientSideError && !!localAgent.name && !!localAgent.type && !!localAgent.guideline_prompt) {
       try {
         const response = await callApi(localAgentId, localAgent)
         if (response && updateAgentList) {
           updateAgentList()
           handleCloseDialog()
           setLoading(false)
-          // TODO: remove this and fix updateAgentList
-          window.location.reload()
           return
         }
         setError('Error while saving the agent.')
