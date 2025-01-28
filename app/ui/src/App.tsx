@@ -1,8 +1,8 @@
 import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalAuthenticationTemplate, MsalProvider } from "@azure/msal-react";
-import { Button, makeStyles } from "@fluentui/react-components";
+import { Avatar, Button, makeStyles } from "@fluentui/react-components";
 import { ChevronLeft20Regular } from "@fluentui/react-icons";
-import { Route, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import logo from './assets/Azure.svg';
 import { interactionType, loginRequest } from "./authConfig";
 import { NavMenu, Pages } from "./Navigation";
