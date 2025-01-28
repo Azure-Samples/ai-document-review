@@ -52,7 +52,13 @@ const AgentCard: React.FC<AgentCardProps> = ({
   return (
     <Card onClick={() => safeOnViewAgent(agent)} key={agent.id} className={classes.card}>
       <CardHeader
-        header={<Text weight="semibold">{agent.name}</Text>}
+        header={
+          <Text
+            weight="semibold" className={classes.cardHeaderTitle}
+          >
+            {agent.name}
+          </Text>
+        }
         description={
           <Caption1 className={classes.caption}>
             {agent.updated_at_UTC

@@ -6,6 +6,12 @@ const flex = {
 }
 
 const useStyles = makeStyles({
+  cardHeaderTitle: {
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      maxWidth: '165px',
+  },
   cardFooter: {
     marginTop: "auto",
     display: "flex",
