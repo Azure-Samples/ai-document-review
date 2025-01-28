@@ -242,21 +242,9 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
               </Field>
             </div>
             <div className={classes.root}>
-             <Field required={localMode!= "view"} label="Prompt">
+              <Field required={localMode != "view"} label="Prompt">
               {localMode === 'view' ? (
                 <div id="agent-prompt" className={classes.largeViewModeText} style={{ position: 'relative' }}>
-                  <Tooltip content="Copy Prompt" relationship="label">
-                  <Button
-                    icon={<CopyRegular />}
-                    onClick={() => navigator.clipboard.writeText(localAgent.guideline_prompt)}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      margin: '5px',
-                    }}
-                    />
-                  </Tooltip>
                   <div>{localAgent.guideline_prompt}</div>
                 </div>
 
@@ -274,6 +262,12 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
               )}
                 {promptInputError && <Field validationMessage={'Prompt ' + promptInputError}></Field>}
               </Field>
+              <Tooltip content="Copy Prompt" relationship="label">
+                  <Button
+                    icon={<CopyRegular />}
+                    onClick={() => navigator.clipboard.writeText(localAgent.guideline_prompt)}
+                    />
+              </Tooltip>
             </div>
           </DialogContent>
           <DialogActions className={classes.bottomLeftButtonContainer}>
