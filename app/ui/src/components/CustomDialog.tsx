@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 import {
   Dialog,
   DialogSurface,
@@ -6,15 +6,15 @@ import {
   DialogBody,
   DialogActions,
   Button,
-  Spinner,
-} from "@fluentui/react-components";
+  Spinner
+} from '@fluentui/react-components'
 
 interface CustomDialogProps {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  onConfirm: () => Promise<void>;
-  onCancel: () => void;
+  isOpen: boolean
+  title: string
+  message: string
+  onConfirm: () => Promise<void>
+  onCancel: () => void
 }
 
 const CustomDialog: React.FC<CustomDialogProps> = ({
@@ -22,29 +22,29 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
   title,
   message,
   onConfirm,
-  onCancel,
+  onCancel
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleConfirm = async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
+    setIsLoading(true)
+    setErrorMessage(null)
     try {
-      await onConfirm();
+      await onConfirm()
     } catch (error) {
-      console.error("Error during operation:", error);
-      setErrorMessage("An error occurred. Please try again.");
+      console.error('Error during operation:', error)
+      setErrorMessage('An error occurred. Please try again.')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleCancel = () => {
-    setErrorMessage(null);
-    setIsLoading(false); 
-    onCancel();
-  };
+    setErrorMessage(null)
+    setIsLoading(false)
+    onCancel()
+  }
 
   return (
     <Dialog aria-labelledby="custom-dialog-title" open={isOpen}>
@@ -53,7 +53,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
           <DialogTitle id="custom-dialog-title">{title}</DialogTitle>
           <p>{message}</p>
 
-          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
 
           <DialogActions>
             <Button onClick={handleCancel} appearance="secondary" disabled={isLoading}>
@@ -65,13 +65,13 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
               disabled={isLoading}
               icon={isLoading ? <Spinner size="tiny" /> : undefined}
             >
-              {isLoading ? "Processing..." : "Confirm"}
+              {isLoading ? 'Processing...' : 'Confirm'}
             </Button>
           </DialogActions>
         </DialogBody>
       </DialogSurface>
     </Dialog>
-  );
-};
+  )
+}
 
-export default CustomDialog;
+export default CustomDialog

@@ -1,16 +1,15 @@
-import React from "react";
-import aiDocIcon from '../assets/ai-doc.png';
-import useStyles from "../styles/useStyles";
-
+import React from 'react'
+import aiDocIcon from '../assets/ai-doc.png'
+import useStyles from '../styles/useStyles'
 
 interface PageHeaderProps {
-  title: string;
-  description: string;
-  customElement?: React.ReactNode;
+  title: string
+  description: string
+  customElement?: React.ReactNode
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({ title, description, customElement }) => {
-  const classes = useStyles();
+  const classes = useStyles()
 
   return (
     <div className={classes.container}>
@@ -25,7 +24,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, description, customEleme
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PageHeader;
+export default PageHeader

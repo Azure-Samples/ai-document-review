@@ -18,7 +18,11 @@ import { CopyRegular, DismissRegular, EditRegular, SaveRegular } from '@fluentui
 import { addAgent, updateAgent } from '../services/api'
 import ErrorMessage from './ErrorMessage'
 import useStyles from '../styles/useStyles'
-import { PLACEHOLDER_AGENT_GUIDELINE_PROMPT, PLACEHOLDER_AGENT_NAME, PLACEHOLDER_AGENT_TYPE } from '../constants'
+import {
+  PLACEHOLDER_AGENT_GUIDELINE_PROMPT,
+  PLACEHOLDER_AGENT_NAME,
+  PLACEHOLDER_AGENT_TYPE
+} from '../constants'
 
 interface AgentDialogProps {
   agentId: string
@@ -51,7 +55,6 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
   const [localMode, setLocalMode] = useState(mode)
   const [isReadOnly, setIsReadOnly] = useState(localMode === 'view')
 
-
   const classes = useStyles()
 
   useEffect(() => {
@@ -74,8 +77,8 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     view: 'View Agent',
     edit: 'Edit Agent',
     duplicate: 'Duplicate Agent',
-    add: 'Add Agent',
-  };
+    add: 'Add Agent'
+  }
 
   const handleInputChange =
     (field: 'name' | 'type' | 'guideline_prompt') =>
@@ -128,7 +131,12 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     setTypeInputError(hasErrorInInput(localAgent.type, 50))
     setPromptInputError(hasErrorInInput(localAgent.guideline_prompt, 5000))
 
-    if (!hasClientSideError && !!localAgent.name && !!localAgent.type && !!localAgent.guideline_prompt) {
+    if (
+      !hasClientSideError &&
+      !!localAgent.name &&
+      !!localAgent.type &&
+      !!localAgent.guideline_prompt
+    ) {
       try {
         const response = await callApi(localAgentId, localAgent)
         if (response && updateAgentList) {
@@ -179,17 +187,16 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
         <DialogBody>
           <DialogTitle>
             {dialogTitles[localMode] || 'Agent'}
-            {localMode == "view" &&
+            {localMode == 'view' && (
               <Tooltip content="Edit Agent" relationship="label">
                 <Button
-                style={{margin: '10px'}}
-                onClick={handleEdit}
-                appearance="secondary"
-                icon={<EditRegular />}
-              >
-                </Button>
+                  style={{ margin: '10px' }}
+                  onClick={handleEdit}
+                  appearance="secondary"
+                  icon={<EditRegular />}
+                ></Button>
               </Tooltip>
-            }
+            )}
           </DialogTitle>
           <Button
             className={classes.closeButton}
@@ -203,83 +210,89 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
             )}
             <Divider className={classes.divider} />
             <div className={classes.root}>
-              <Field required={localMode!= "view"} label="Name">
-              {localMode === 'view' ? (
-                <div id="agent-name" className={classes.viewModeText}>
-                  {localAgent.name}
-                </div>
-              ) : (
-                <Input
-                  id="agent-name"
-                  required
-                  placeholder={PLACEHOLDER_AGENT_NAME}
-                  onChange={handleInputChange('name')}
-                  readOnly={isReadOnly}
-                  value={localAgent.name}
-                  disabled={loading}
-                />
-              )}
+              <Field required={localMode != 'view'} label="Name">
+                {localMode === 'view' ? (
+                  <div id="agent-name" className={classes.viewModeText}>
+                    {localAgent.name}
+                  </div>
+                ) : (
+                  <Input
+                    id="agent-name"
+                    required
+                    placeholder={PLACEHOLDER_AGENT_NAME}
+                    onChange={handleInputChange('name')}
+                    readOnly={isReadOnly}
+                    value={localAgent.name}
+                    disabled={loading}
+                  />
+                )}
                 {nameInputError && <Field validationMessage={'Name ' + nameInputError}></Field>}
               </Field>
             </div>
             <div className={classes.root}>
-              <Field required={localMode!= "view"} label="Type">
-              {localMode === 'view' ? (
-                <div id="agent-type" className={classes.viewModeText}>
-                  {localAgent.type}
-                </div>
-              ) : (
-                <Input
-                  id="agent-type"
-                  placeholder={PLACEHOLDER_AGENT_TYPE}
-                  onChange={handleInputChange('type')}
-                  value={localAgent.type}
-                  readOnly={isReadOnly}
-                  disabled={loading}
-                />
-              )}
+              <Field required={localMode != 'view'} label="Type">
+                {localMode === 'view' ? (
+                  <div id="agent-type" className={classes.viewModeText}>
+                    {localAgent.type}
+                  </div>
+                ) : (
+                  <Input
+                    id="agent-type"
+                    placeholder={PLACEHOLDER_AGENT_TYPE}
+                    onChange={handleInputChange('type')}
+                    value={localAgent.type}
+                    readOnly={isReadOnly}
+                    disabled={loading}
+                  />
+                )}
                 {typeInputError && <Field validationMessage={'Type ' + typeInputError}></Field>}
               </Field>
             </div>
             <div className={classes.root}>
-              <Field required={localMode != "view"} label="Prompt">
-              {localMode === 'view' ? (
-                <div id="agent-prompt" className={classes.largeViewModeText} style={{ position: 'relative' }}>
-                  <div>{localAgent.guideline_prompt}</div>
-                </div>
-
-              ) : (
-                <Textarea
-                  className={classes.largeTextArea}
-                  id="agent-prompt"
-                  required
-                  placeholder={PLACEHOLDER_AGENT_GUIDELINE_PROMPT}
-                  onChange={handleInputChange('guideline_prompt')}
-                  value={localAgent.guideline_prompt}
-                  readOnly={isReadOnly}
-                  disabled={loading}
-                />
-              )}
-                {promptInputError && <Field validationMessage={'Prompt ' + promptInputError}></Field>}
+              <Field required={localMode != 'view'} label="Prompt">
+                {localMode === 'view' ? (
+                  <div
+                    id="agent-prompt"
+                    className={classes.largeViewModeText}
+                    style={{ position: 'relative' }}
+                  >
+                    <div>{localAgent.guideline_prompt}</div>
+                  </div>
+                ) : (
+                  <Textarea
+                    className={classes.largeTextArea}
+                    id="agent-prompt"
+                    required
+                    placeholder={PLACEHOLDER_AGENT_GUIDELINE_PROMPT}
+                    onChange={handleInputChange('guideline_prompt')}
+                    value={localAgent.guideline_prompt}
+                    readOnly={isReadOnly}
+                    disabled={loading}
+                  />
+                )}
+                {promptInputError && (
+                  <Field validationMessage={'Prompt ' + promptInputError}></Field>
+                )}
               </Field>
               <Tooltip content="Copy Prompt" relationship="label">
-                  <Button
-                    icon={<CopyRegular />}
-                    onClick={() => navigator.clipboard.writeText(localAgent.guideline_prompt)}
-                    />
+                <Button
+                  icon={<CopyRegular />}
+                  onClick={() => navigator.clipboard.writeText(localAgent.guideline_prompt)}
+                />
               </Tooltip>
             </div>
           </DialogContent>
           <DialogActions className={classes.bottomLeftButtonContainer}>
-            { localMode!= "view" && <Button
-              onClick={handleSave}
-              appearance="primary"
-              disabled={loading || hasClientSideError}
-              icon={loading ? <Spinner size="tiny" /> : <SaveRegular />}
-            >
+            {localMode != 'view' && (
+              <Button
+                onClick={handleSave}
+                appearance="primary"
+                disabled={loading || hasClientSideError}
+                icon={loading ? <Spinner size="tiny" /> : <SaveRegular />}
+              >
                 {loading ? 'Saving...' : 'Apply'}
-            </Button>
-            }
+              </Button>
+            )}
           </DialogActions>
         </DialogBody>
       </DialogSurface>

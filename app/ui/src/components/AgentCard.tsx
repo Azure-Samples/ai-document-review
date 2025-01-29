@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import {
   Card,
   CardFooter,
@@ -7,29 +7,26 @@ import {
   Button,
   Caption1,
   Text,
-  Tooltip,
-} from "@fluentui/react-components";
-import {
-  DeleteRegular,
-  SquareMultipleRegular,
-} from "@fluentui/react-icons";
+  Tooltip
+} from '@fluentui/react-components'
+import { DeleteRegular, SquareMultipleRegular } from '@fluentui/react-icons'
 
 interface Agent {
-  id: string;
-  name: string;
-  guideline_prompt: string;
-  type: string;
-  created_at_UTC?: string;
-  updated_at_UTC?: string;
+  id: string
+  name: string
+  guideline_prompt: string
+  type: string
+  created_at_UTC?: string
+  updated_at_UTC?: string
 }
 
 interface AgentCardProps {
-  agent: Agent;
-  classes: Record<string, string>;
-  onViewAgent: (agent: Agent) => void;
-  onDeleteAgent: (id: string) => void;
-  onEditAgent: (id: string) => void;
-  onDuplicateAgent: (id: string) => void;
+  agent: Agent
+  classes: Record<string, string>
+  onViewAgent: (agent: Agent) => void
+  onDeleteAgent: (id: string) => void
+  onEditAgent: (id: string) => void
+  onDuplicateAgent: (id: string) => void
 }
 
 const AgentCard: React.FC<AgentCardProps> = ({
@@ -37,25 +34,22 @@ const AgentCard: React.FC<AgentCardProps> = ({
   classes,
   onViewAgent,
   onDeleteAgent,
-  onDuplicateAgent,
+  onDuplicateAgent
 }) => {
-
   const extractDate = (dateString: string | number | Date | undefined) => {
-    const date = new Date(dateString || "");
-    return !isNaN(date.getTime()) ? date.toLocaleDateString() : "Date not available";
-  };
+    const date = new Date(dateString || '')
+    return !isNaN(date.getTime()) ? date.toLocaleDateString() : 'Date not available'
+  }
 
-  const safeOnViewAgent = onViewAgent || (() => {});
-  const safeOnDeleteAgent = onDeleteAgent || (() => {});
-  const safeOnDuplicateAgent = onDuplicateAgent || (() => {});
+  const safeOnViewAgent = onViewAgent || (() => {})
+  const safeOnDeleteAgent = onDeleteAgent || (() => {})
+  const safeOnDuplicateAgent = onDuplicateAgent || (() => {})
 
   return (
     <Card onClick={() => safeOnViewAgent(agent)} key={agent.id} className={classes.card}>
       <CardHeader
         header={
-          <Text
-            weight="semibold" className={classes.cardHeaderTitle}
-          >
+          <Text weight="semibold" className={classes.cardHeaderTitle}>
             {agent.name}
           </Text>
         }
@@ -73,21 +67,27 @@ const AgentCard: React.FC<AgentCardProps> = ({
       <CardFooter className={classes.cardFooter}>
         <Tooltip content="Delete Agent" relationship="label">
           <Button
-            onClick={(e) => { e.stopPropagation(); safeOnDeleteAgent(agent.id); }}
+            onClick={(e) => {
+              e.stopPropagation()
+              safeOnDeleteAgent(agent.id)
+            }}
             icon={<DeleteRegular />}
             aria-label="Delete Agent"
           />
         </Tooltip>
         <Tooltip content="Duplicate Agent" relationship="label">
           <Button
-            onClick={(e) => { e.stopPropagation(); safeOnDuplicateAgent(agent.id); }}
+            onClick={(e) => {
+              e.stopPropagation()
+              safeOnDuplicateAgent(agent.id)
+            }}
             icon={<SquareMultipleRegular />}
             aria-label="Duplicate Agent"
           />
         </Tooltip>
       </CardFooter>
     </Card>
-  );
-};
+  )
+}
 
-export default AgentCard;
+export default AgentCard

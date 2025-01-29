@@ -13,17 +13,15 @@ const AddCard: React.FC<AddCardProps> = ({ onClick, labelText }) => {
   const handleClick = onClick || (() => {})
 
   return (
-    <Card 
+    <Card
       aria-label={labelText}
       role="button"
-      className={classes.disabledCard} 
-      appearance="filled-alternative" 
+      className={classes.disabledCard}
+      appearance="filled-alternative"
       onClick={handleClick}
     >
       <AddRegular className={classes.addIcon} />
-      <Text className={classes.addIconText}>
-        {labelText}
-      </Text>
+      <Text className={classes.addIconText}>{labelText}</Text>
     </Card>
   )
 }

@@ -1,102 +1,102 @@
-import { useState, useEffect } from "react";
-import { SkeletonItem } from "@fluentui/react-components";
-import { getAgents, deleteAgent } from "../services/api";
-import AddCard from "./AddCard";
-import AgentDialog from "./AgentDialog";
-import ErrorMessage from "./ErrorMessage";
-import CustomDialog from "./CustomDialog";
-import useStyles from "../styles/useStyles";
-import AgentCard from "./AgentCard";
+import { useState, useEffect } from 'react'
+import { SkeletonItem } from '@fluentui/react-components'
+import { getAgents, deleteAgent } from '../services/api'
+import AddCard from './AddCard'
+import AgentDialog from './AgentDialog'
+import ErrorMessage from './ErrorMessage'
+import CustomDialog from './CustomDialog'
+import useStyles from '../styles/useStyles'
+import AgentCard from './AgentCard'
 
 function AgentList() {
   interface Agent {
-    id: string;
-    name: string;
-    guideline_prompt: string;
-    type: string;
-    created_at_UTC?: string;
-    updated_at_UTC?: string;
+    id: string
+    name: string
+    guideline_prompt: string
+    type: string
+    created_at_UTC?: string
+    updated_at_UTC?: string
   }
 
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [showDialog, setShowDialog] = useState(false);
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [showDialog, setShowDialog] = useState(false)
   const [agentInFocus, setAgentInFocus] = useState<Agent>({
-    id: "",
-    name: "",
-    guideline_prompt: "",
-    type: "",
-  });
-  const [agentLoadError, setAgentLoadError] = useState("");
-  const [mode, setMode] = useState<"view" | "add" | "edit" | "duplicate">("view");
-  const [agentToBeDeleted, setAgentToBeDeleted] = useState("");
+    id: '',
+    name: '',
+    guideline_prompt: '',
+    type: ''
+  })
+  const [agentLoadError, setAgentLoadError] = useState('')
+  const [mode, setMode] = useState<'view' | 'add' | 'edit' | 'duplicate'>('view')
+  const [agentToBeDeleted, setAgentToBeDeleted] = useState('')
 
-  const classes = useStyles();
+  const classes = useStyles()
 
   async function fetchAgents() {
     try {
-      const data = await getAgents();
-      if (data.length === 0) setAgentLoadError("No agents found.");
-      setAgents(data);
+      const data = await getAgents()
+      if (data.length === 0) setAgentLoadError('No agents found.')
+      setAgents(data)
     } catch {
-      setAgentLoadError("There was an issue retrieving agents.");
+      setAgentLoadError('There was an issue retrieving agents.')
     }
   }
 
   useEffect(() => {
-    fetchAgents();
-  }, []);
+    fetchAgents()
+  }, [])
 
   const updateAgentList = async () => {
-    await fetchAgents();
-  };
+    await fetchAgents()
+  }
 
   const handleDeleteConfirmation = async (id: string) => {
     try {
-      await deleteAgent(id);
-      setAgents((prevAgents) => prevAgents.filter((agent) => agent.id !== id));
-      setAgentToBeDeleted("");
+      await deleteAgent(id)
+      setAgents((prevAgents) => prevAgents.filter((agent) => agent.id !== id))
+      setAgentToBeDeleted('')
     } catch (error) {
-      console.error("Error deleting agent:", error);
+      console.error('Error deleting agent:', error)
     }
-  };
+  }
 
   const handleCloseDialog = () => {
-    setAgentInFocus({ id: "", name: "", guideline_prompt: "", type: "" });
-    setShowDialog(false);
-  };
+    setAgentInFocus({ id: '', name: '', guideline_prompt: '', type: '' })
+    setShowDialog(false)
+  }
 
   const handleAddNewAgent = () => {
-    setAgentInFocus({ id: "", name: "", guideline_prompt: "", type: "" });
-    setMode("add");
-    setShowDialog(true);
-  };
+    setAgentInFocus({ id: '', name: '', guideline_prompt: '', type: '' })
+    setMode('add')
+    setShowDialog(true)
+  }
 
   const handleViewAgent = (agent: Agent) => {
-    setAgentInFocus(agent);
-    setMode("view");
-    setShowDialog(true);
-  };
+    setAgentInFocus(agent)
+    setMode('view')
+    setShowDialog(true)
+  }
 
   const handleDeleteAgent = (id: string) => {
-    setAgentToBeDeleted(id);
-  };
+    setAgentToBeDeleted(id)
+  }
 
   const handleEditAgent = (id: string) => {
-    const agentToEdit = agents.find((a) => a.id === id);
-    if (agentToEdit) setAgentInFocus(agentToEdit);
-    setMode("edit");
-    setShowDialog(true);
-  };
+    const agentToEdit = agents.find((a) => a.id === id)
+    if (agentToEdit) setAgentInFocus(agentToEdit)
+    setMode('edit')
+    setShowDialog(true)
+  }
 
   const handleDuplicateAgent = (id: string) => {
-    const agentToDuplicate = agents.find((a) => a.id === id);
+    const agentToDuplicate = agents.find((a) => a.id === id)
     if (agentToDuplicate) {
-      const duplicatedAgent = { ...agentToDuplicate, name: `${agentToDuplicate.name} (copy)` };
-      setAgentInFocus(duplicatedAgent);
-      setMode("duplicate");
-      setShowDialog(true);
+      const duplicatedAgent = { ...agentToDuplicate, name: `${agentToDuplicate.name} (copy)` }
+      setAgentInFocus(duplicatedAgent)
+      setMode('duplicate')
+      setShowDialog(true)
     }
-  };
+  }
 
   return (
     <div>
@@ -149,4 +149,4 @@ function AgentList() {
   )
 }
 
-export default AgentList;
+export default AgentList
