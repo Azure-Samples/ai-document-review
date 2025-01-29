@@ -173,7 +173,7 @@ export async function updateAgent(
   agent: { name: string; guideline_prompt: string; type: string; }
 ) {
   try {
-    const response = await callApi(`${agentsPath}/${agent_id}`, 'PATCH', agent);
+    const response = await callApi(`${agentsPath}/${agentId}`, 'PATCH', agent);
     if (response.ok) {
       return response.json();
     }

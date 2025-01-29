@@ -7,20 +7,12 @@ import ErrorMessage from './ErrorMessage'
 import CustomDialog from './CustomDialog'
 import useStyles from '../styles/useStyles'
 import AgentCard from './AgentCard'
+import { PromptAgent } from '../types/prompt-agent'
 
 function AgentList() {
-  interface Agent {
-    id: string
-    name: string
-    guideline_prompt: string
-    type: string
-    created_at_UTC?: string
-    updated_at_UTC?: string
-  }
-
-  const [agents, setAgents] = useState<Agent[]>([])
+  const [agents, setAgents] = useState<PromptAgent[]>([])
   const [showDialog, setShowDialog] = useState(false)
-  const [agentInFocus, setAgentInFocus] = useState<Agent>({
+  const [agentInFocus, setAgentInFocus] = useState<PromptAgent>({
     id: '',
     name: '',
     guideline_prompt: '',
@@ -71,7 +63,7 @@ function AgentList() {
     setShowDialog(true)
   }
 
-  const handleViewAgent = (agent: Agent) => {
+  const handleViewAgent = (agent: PromptAgent) => {
     setAgentInFocus(agent)
     setMode('view')
     setShowDialog(true)

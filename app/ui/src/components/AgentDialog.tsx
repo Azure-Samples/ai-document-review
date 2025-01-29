@@ -23,11 +23,12 @@ import {
   PLACEHOLDER_AGENT_NAME,
   PLACEHOLDER_AGENT_TYPE
 } from '../constants'
+import { PromptAgent } from '../types/prompt-agent'
 
 interface AgentDialogProps {
   agentId: string
   handleCloseDialog: () => void
-  selectedAgent: { id: string; type: string; name: string; guideline_prompt: string }
+  selectedAgent: PromptAgent
   showDialog: boolean
   setShowDialog: (open: boolean) => void
   mode: 'view' | 'edit' | 'add' | 'duplicate'

@@ -10,20 +10,13 @@ import {
   Tooltip
 } from '@fluentui/react-components'
 import { DeleteRegular, SquareMultipleRegular } from '@fluentui/react-icons'
+import { PromptAgent } from '../types/prompt-agent'
 
-interface Agent {
-  id: string
-  name: string
-  guideline_prompt: string
-  type: string
-  created_at_UTC?: string
-  updated_at_UTC?: string
-}
 
 interface AgentCardProps {
-  agent: Agent
+  agent: PromptAgent
   classes: Record<string, string>
-  onViewAgent: (agent: Agent) => void
+  onViewAgent: (agent: PromptAgent) => void
   onDeleteAgent: (id: string) => void
   onEditAgent: (id: string) => void
   onDuplicateAgent: (id: string) => void
