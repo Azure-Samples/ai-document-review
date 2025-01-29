@@ -169,7 +169,7 @@ export async function addAgent(agent: { name: string; guideline_prompt: string; 
 }
 
 export async function updateAgent(
-  agent_id: string,
+  agentId: string,
   agent: { name: string; guideline_prompt: string; type: string; }
 ) {
   try {
