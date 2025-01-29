@@ -33,8 +33,6 @@ nodes:
   source:
     type: code
     path: consolidator.jinja2
-  inputs:
-    guidelines: ${guidelines_prompt.output}
   use_variants: false
 - name: merge
   type: python
