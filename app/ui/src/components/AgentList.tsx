@@ -5,9 +5,9 @@ import AddCard from './AddCard'
 import AgentDialog from './AgentDialog'
 import ErrorMessage from './ErrorMessage'
 import CustomDialog from './CustomDialog'
-import useStyles from '../styles/useStyles'
 import AgentCard from './AgentCard'
 import { PromptAgent } from '../types/prompt-agent'
+import { sharedStyles } from '../styles/sharedStyles'
 
 function AgentList() {
   const [agents, setAgents] = useState<PromptAgent[]>([])
@@ -22,7 +22,7 @@ function AgentList() {
   const [mode, setMode] = useState<'view' | 'add' | 'edit' | 'duplicate'>('view')
   const [agentToBeDeleted, setAgentToBeDeleted] = useState('')
 
-  const classes = useStyles()
+  const sharedClasses = sharedStyles()
 
   async function fetchAgents() {
     try {
@@ -92,7 +92,7 @@ function AgentList() {
 
   return (
     <div>
-      <div className={classes.agentsContainer}>
+      <div className={sharedClasses.agentsContainer}>
         {agentLoadError && (
           <ErrorMessage
             title="Error loading agents"
@@ -100,15 +100,14 @@ function AgentList() {
             onClose={() => setAgentLoadError('')}
           />
         )}
-        <div className={classes.row}>
+        <div className={sharedClasses.row}>
           <AddCard onClick={handleAddNewAgent} labelText="Add new agent" />
           {agents.length === 0
-            ? Array.from({ length: 2 }, (_, i) => <SkeletonItem key={i} className={classes.card} />)
+            ? Array.from({ length: 2 }, (_, i) => <SkeletonItem key={i} className={sharedClasses.card} />)
             : agents.map((agent) => (
                 <AgentCard
                   key={agent.id}
                   agent={agent}
-                  classes={classes}
                   onViewAgent={handleViewAgent}
                   onDeleteAgent={handleDeleteAgent}
                   onEditAgent={handleEditAgent}

@@ -7,15 +7,44 @@ import {
   Button,
   Caption1,
   Text,
-  Tooltip
+  Tooltip,
+  makeStyles
 } from '@fluentui/react-components'
 import { DeleteRegular, SquareMultipleRegular } from '@fluentui/react-icons'
 import { PromptAgent } from '../types/prompt-agent'
+import { sharedStyles } from '../styles/sharedStyles'
 
+
+const componentSyles = makeStyles({
+  cardHeaderTitle: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    maxWidth: '165px',
+  },
+  cardFooter: {
+    marginTop: "auto",
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "8px"
+  },
+  cardbody: {
+    padding: '12px',
+    width: '175px',
+    textAlign: 'left',
+    display: '-webkit-box',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: 3,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    wordBreak: 'break-word',
+    maxWidth: '175px',
+    maxHeight: '125px'
+  }
+})
 
 interface AgentCardProps {
   agent: PromptAgent
-  classes: Record<string, string>
   onViewAgent: (agent: PromptAgent) => void
   onDeleteAgent: (id: string) => void
   onEditAgent: (id: string) => void
@@ -24,7 +53,6 @@ interface AgentCardProps {
 
 const AgentCard: React.FC<AgentCardProps> = ({
   agent,
-  classes,
   onViewAgent,
   onDeleteAgent,
   onDuplicateAgent
@@ -34,20 +62,22 @@ const AgentCard: React.FC<AgentCardProps> = ({
     return !isNaN(date.getTime()) ? date.toLocaleDateString() : 'Date not available'
   }
 
+  const componentClasses = componentSyles()
+  const sharedClasses = sharedStyles()
   const safeOnViewAgent = onViewAgent || (() => {})
   const safeOnDeleteAgent = onDeleteAgent || (() => {})
   const safeOnDuplicateAgent = onDuplicateAgent || (() => {})
 
   return (
-    <Card onClick={() => safeOnViewAgent(agent)} key={agent.id} className={classes.card}>
+    <Card onClick={() => safeOnViewAgent(agent)} key={agent.id} className={sharedClasses.card}>
       <CardHeader
         header={
-          <Text weight="semibold" className={classes.cardHeaderTitle}>
+          <Text weight="semibold" className={componentClasses.cardHeaderTitle}>
             {agent.name}
           </Text>
         }
         description={
-          <Caption1 className={classes.caption}>
+          <Caption1 className={sharedClasses.caption}>
             {agent.updated_at_UTC
               ? `Updated: ${extractDate(agent.updated_at_UTC)}`
               : `Created: ${extractDate(agent.created_at_UTC)}`}
@@ -55,9 +85,9 @@ const AgentCard: React.FC<AgentCardProps> = ({
         }
       />
       <CardPreview>
-        <Text className={classes.cardbody}>{agent.guideline_prompt}</Text>
+        <Text className={componentClasses.cardbody}>{agent.guideline_prompt}</Text>
       </CardPreview>
-      <CardFooter className={classes.cardFooter}>
+      <CardFooter className={componentClasses.cardFooter}>
         <Tooltip content="Delete Agent" relationship="label">
           <Button
             onClick={(e) => {

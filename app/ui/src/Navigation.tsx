@@ -22,8 +22,8 @@ import AgentManager from "./pages/admin/AgentManager";
 import Files from "./pages/files/Files";
 import Review from "./pages/review/Review";
 import SettingManager from "./pages/admin/SettingManager";
-import useStyles from "./styles/useStyles";
 import { DOCUMENTATION_URL } from "./constants";
+import { sharedStyles } from "./styles/sharedStyles";
 
 
 // paths
@@ -38,7 +38,7 @@ const paths = {
 const NavMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const classes = useStyles()
+  const sharedClasses = sharedStyles();
 
   const isSelected = (path: string) => location.pathname === path;
 
@@ -53,7 +53,7 @@ const NavMenu = () => {
           <MenuItem
             icon={<Home20Filled />}
             onClick={() => navigate(paths.home)}
-            className={isSelected(paths.home) ? classes.selected  : ""}
+            className={isSelected(paths.home) ? sharedClasses.selected  : ""}
           >
             Home
           </MenuItem>
@@ -66,14 +66,14 @@ const NavMenu = () => {
             <MenuItem
               icon={<Prompt20Filled />}
               onClick={() => navigate(paths.adminAgents)}
-              className={isSelected(paths.adminAgents) ? classes.selected : ""}
+              className={isSelected(paths.adminAgents) ? sharedClasses.selected : ""}
             >
               Agents Manager
             </MenuItem>
             <MenuItem
               icon={<Settings20Filled />}
               onClick={() => navigate(paths.settings)}
-              className={isSelected(paths.settings) ? classes.selected : ""}
+              className={isSelected(paths.settings) ? sharedClasses.selected : ""}
             >
               Settings
             </MenuItem>

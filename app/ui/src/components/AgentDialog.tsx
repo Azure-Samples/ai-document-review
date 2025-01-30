@@ -12,18 +12,20 @@ import {
   DialogActions,
   Field,
   Spinner,
-  Tooltip
+  Tooltip,
+  makeStyles,
+  tokens
 } from '@fluentui/react-components'
 import { CopyRegular, DismissRegular, EditRegular, SaveRegular } from '@fluentui/react-icons'
 import { addAgent, updateAgent } from '../services/api'
 import ErrorMessage from './ErrorMessage'
-import useStyles from '../styles/useStyles'
 import {
   PLACEHOLDER_AGENT_GUIDELINE_PROMPT,
   PLACEHOLDER_AGENT_NAME,
   PLACEHOLDER_AGENT_TYPE
 } from '../constants'
 import { PromptAgent } from '../types/prompt-agent'
+import { sharedStyles } from '../styles/sharedStyles'
 
 interface AgentDialogProps {
   agentId: string
@@ -34,6 +36,48 @@ interface AgentDialogProps {
   mode: 'view' | 'edit' | 'add' | 'duplicate'
   updateAgentList?: () => void
 }
+
+const componentSyles = makeStyles({
+  largeTextArea: {
+    width: '200%',
+    height: '250px',
+    padding: '8px',
+    marginTop: '2px',
+    marginBottom: '8px'
+  },
+  viewModeText: {
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    padding: '5px'
+  },
+  largeViewModeText: {
+    width: '170%',
+    whiteSpace: 'pre-wrap',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    padding: '5px',
+    marginTop: '2px',
+    marginBottom: '8px',
+    height: '250px',
+    overflowY: 'auto'
+  },
+  bottomLeftButtonContainer: {
+    position: 'absolute',
+    bottom: '16px',
+    right: '16px'
+  },
+  dialogSurface: {
+    paddingBottom: '64px',
+    minHeight: '625px',
+    maxHeight: '90%',
+    minWidth: '50px',
+    maxWidth: '850px',
+    height: '650px',
+    width: '850px',
+    padding: '20px',
+    backgroundColor: tokens.colorNeutralBackground6
+  }
+})
 
 const AgentDialog: React.FC<AgentDialogProps> = ({
   agentId,
@@ -56,7 +100,8 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
   const [localMode, setLocalMode] = useState(mode)
   const [isReadOnly, setIsReadOnly] = useState(localMode === 'view')
 
-  const classes = useStyles()
+  const componentClasses = componentSyles()
+  const sharedClasses = sharedStyles()
 
   useEffect(() => {
     setIsReadOnly(localMode === 'view')
@@ -184,7 +229,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
         }
       }}
     >
-      <DialogSurface className={classes.dialogSurface}>
+      <DialogSurface className={componentClasses.dialogSurface}>
         <DialogBody>
           <DialogTitle>
             {dialogTitles[localMode] || 'Agent'}
@@ -200,7 +245,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
             )}
           </DialogTitle>
           <Button
-            className={classes.closeButton}
+            className={sharedClasses.closeButton}
             icon={<DismissRegular />}
             onClick={localHandleCloseDialog}
             disabled={loading}
@@ -209,11 +254,11 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
             {hasError && error && (
               <ErrorMessage title="Error!" message={error} onClose={onErrorClose} />
             )}
-            <Divider className={classes.divider} />
-            <div className={classes.root}>
+            <Divider className={sharedClasses.divider} />
+            <div className={sharedClasses.root}>
               <Field required={localMode != 'view'} label="Name">
                 {localMode === 'view' ? (
-                  <div id="agent-name" className={classes.viewModeText}>
+                  <div id="agent-name" className={componentClasses.viewModeText}>
                     {localAgent.name}
                   </div>
                 ) : (
@@ -230,10 +275,10 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
                 {nameInputError && <Field validationMessage={'Name ' + nameInputError}></Field>}
               </Field>
             </div>
-            <div className={classes.root}>
+            <div className={sharedClasses.root}>
               <Field required={localMode != 'view'} label="Type">
                 {localMode === 'view' ? (
-                  <div id="agent-type" className={classes.viewModeText}>
+                  <div id="agent-type" className={componentClasses.viewModeText}>
                     {localAgent.type}
                   </div>
                 ) : (
@@ -249,19 +294,19 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
                 {typeInputError && <Field validationMessage={'Type ' + typeInputError}></Field>}
               </Field>
             </div>
-            <div className={classes.root}>
+            <div className={sharedClasses.root}>
               <Field required={localMode != 'view'} label="Prompt">
                 {localMode === 'view' ? (
                   <div
                     id="agent-prompt"
-                    className={classes.largeViewModeText}
+                    className={componentClasses.largeViewModeText}
                     style={{ position: 'relative' }}
                   >
                     <div>{localAgent.guideline_prompt}</div>
                   </div>
                 ) : (
                   <Textarea
-                    className={classes.largeTextArea}
+                    className={componentClasses.largeTextArea}
                     id="agent-prompt"
                     required
                     placeholder={PLACEHOLDER_AGENT_GUIDELINE_PROMPT}
@@ -283,7 +328,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
               </Tooltip>
             </div>
           </DialogContent>
-          <DialogActions className={classes.bottomLeftButtonContainer}>
+          <DialogActions className={componentClasses.bottomLeftButtonContainer}>
             {localMode != 'view' && (
               <Button
                 onClick={handleSave}
