@@ -7,6 +7,7 @@ import pdfIcon from '../../assets/pdf.svg';
 import { listBlobs, uploadBlob } from '../../services/storage';
 import PageHeader from '../../components/PageHeader';
 import { DOCUMENTATION_URL } from '../../constants';
+import ErrorMessage from '../../components/ErrorMessage';
 
 const flex = {
   gap: "16px",
@@ -112,12 +113,8 @@ function Files() {
       <Divider className={classes.divider}/>
       <div className={classes.filesContainer}>
         { 
-          blobError && <MessageBar intent="error">
-            <MessageBarBody>
-              <MessageBarTitle>Error loading files</MessageBarTitle>
-              { blobError }
-            </MessageBarBody>
-          </MessageBar>
+          blobError &&
+          <ErrorMessage title="Error loading files" message={blobError} />
         }
         <div className={classes.row}>
           <input

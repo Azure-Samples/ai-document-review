@@ -1,10 +1,16 @@
-import { Button, makeStyles, MessageBar, MessageBarBody, MessageBarTitle } from '@fluentui/react-components'
+import {
+  Button,
+  makeStyles,
+  MessageBar,
+  MessageBarBody,
+  MessageBarTitle
+} from '@fluentui/react-components'
 import { DismissRegular } from '@fluentui/react-icons'
 
 interface ErrorMessageProps {
   title: string
   message: string
-  onClose: () => void
+  onClose?: () => void
 }
 
 const componentSyles = makeStyles({
@@ -13,7 +19,7 @@ const componentSyles = makeStyles({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%'
-  },
+  }
 })
 
 const ErrorMessage = ({ title, message, onClose }: ErrorMessageProps) => {
@@ -25,12 +31,14 @@ const ErrorMessage = ({ title, message, onClose }: ErrorMessageProps) => {
           <MessageBarTitle>{title}</MessageBarTitle>
           {message}
         </MessageBarBody>
-        <Button
-          icon={<DismissRegular />}
-          onClick={onClose}
-          appearance="subtle"
-          style={{ marginLeft: '1rem' }}
-        />
+        {onClose && (
+          <Button
+            icon={<DismissRegular />}
+            onClick={onClose}
+            appearance="subtle"
+            style={{ marginLeft: '1rem' }}
+          />
+        )}
       </div>
     </MessageBar>
   )
