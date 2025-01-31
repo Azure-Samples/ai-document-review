@@ -8,7 +8,6 @@ import {
   MenuGroup,
   MenuGroupHeader,
   MenuDivider,
-  Avatar,
   MenuItemLink,
 } from "@fluentui/react-components";
 import {
@@ -19,11 +18,12 @@ import {
   DocumentBulletListFilled,
 } from "@fluentui/react-icons";
 import { useNavigate, useLocation, Routes, Route } from "react-router-dom";
-import Agents from "./pages/admin/Agents";
+import AgentManager from "./pages/admin/AgentManager";
 import Files from "./pages/files/Files";
 import Review from "./pages/review/Review";
-import Settings from "./pages/admin/Settings";
-import useStyles from "./styles/useStyles";
+import SettingManager from "./pages/admin/SettingManager";
+import { DOCUMENTATION_URL } from "./constants";
+import { sharedStyles } from "./styles/sharedStyles";
 
 
 // paths
@@ -34,12 +34,11 @@ const paths = {
   settings: "/admin/settings",
 };
 
-const documentation_url = "https://github.com/Azure-Samples/ai-document-review";
 
 const NavMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const classes = useStyles()
+  const sharedClasses = sharedStyles();
 
   const isSelected = (path: string) => location.pathname === path;
 
@@ -54,7 +53,7 @@ const NavMenu = () => {
           <MenuItem
             icon={<Home20Filled />}
             onClick={() => navigate(paths.home)}
-            className={isSelected(paths.home) ? classes.selected  : ""}
+            className={isSelected(paths.home) ? sharedClasses.selected  : ""}
           >
             Home
           </MenuItem>
@@ -67,27 +66,22 @@ const NavMenu = () => {
             <MenuItem
               icon={<Prompt20Filled />}
               onClick={() => navigate(paths.adminAgents)}
-              className={isSelected(paths.adminAgents) ? classes.selected : ""}
+              className={isSelected(paths.adminAgents) ? sharedClasses.selected : ""}
             >
               Agents Manager
             </MenuItem>
             <MenuItem
               icon={<Settings20Filled />}
               onClick={() => navigate(paths.settings)}
-              className={isSelected(paths.settings) ? classes.selected : ""}
+              className={isSelected(paths.settings) ? sharedClasses.selected : ""}
             >
               Settings
             </MenuItem>
           </MenuGroup>
           <MenuDivider />
-          <MenuItemLink icon={<DocumentBulletListFilled />} href={documentation_url} target="_blank" rel="noopener noreferrer">
+          <MenuItemLink icon={<DocumentBulletListFilled />} href={DOCUMENTATION_URL} target="_blank" rel="noopener noreferrer">
             Documentation
           </MenuItemLink>
-
-          {/* Account */}
-          <MenuItem>
-            <Avatar aria-label="User" size={32} />
-          </MenuItem>
         </MenuList>
       </MenuPopover>
     </Menu>
@@ -98,8 +92,8 @@ const Pages = () => (
   <Routes>
     <Route path={paths.home} element={<Files />} />
     <Route path={paths.review} element={<Review />} />
-    <Route path={paths.adminAgents} element={<Agents />} />
-    <Route path={paths.settings} element={<Settings />} />
+    <Route path={paths.adminAgents} element={<AgentManager />} />
+    <Route path={paths.settings} element={<SettingManager />} />
   </Routes>
 );
 
