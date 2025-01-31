@@ -29,15 +29,13 @@ const componentSyles = makeStyles({
 const AddCard: React.FC<AddCardProps> = ({ onClick, labelText }) => {
   const componentClasses = componentSyles()
 
-  const handleClick = onClick || (() => {})
-
   return (
     <Card
       aria-label={labelText}
       role="button"
       className={componentClasses.disabledCard}
       appearance="filled-alternative"
-      onClick={handleClick}
+      onClick={() => onClick()}
     >
       <AddRegular className={componentClasses.addIcon} />
       <Text className={componentClasses.addIconText}>{labelText}</Text>

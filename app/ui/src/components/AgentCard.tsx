@@ -1,18 +1,18 @@
-import React from 'react'
 import {
+  Button,
+  Caption1,
   Card,
   CardFooter,
   CardHeader,
   CardPreview,
-  Button,
-  Caption1,
   Text,
   Tooltip,
   makeStyles
 } from '@fluentui/react-components'
 import { DeleteRegular, SquareMultipleRegular } from '@fluentui/react-icons'
-import { PromptAgent } from '../types/prompt-agent'
+import React from 'react'
 import { sharedStyles } from '../styles/sharedStyles'
+import { PromptAgent } from '../types/prompt-agent'
 
 
 const componentSyles = makeStyles({
@@ -64,12 +64,9 @@ const AgentCard: React.FC<AgentCardProps> = ({
 
   const componentClasses = componentSyles()
   const sharedClasses = sharedStyles()
-  const safeOnViewAgent = onViewAgent || (() => {})
-  const safeOnDeleteAgent = onDeleteAgent || (() => {})
-  const safeOnDuplicateAgent = onDuplicateAgent || (() => {})
 
   return (
-    <Card onClick={() => safeOnViewAgent(agent)} key={agent.id} className={sharedClasses.card}>
+    <Card onClick={() => onViewAgent(agent)} key={agent.id} className={sharedClasses.card}>
       <CardHeader
         header={
           <Text weight="semibold" className={componentClasses.cardHeaderTitle}>
@@ -92,7 +89,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
           <Button
             onClick={(e) => {
               e.stopPropagation()
-              safeOnDeleteAgent(agent.id)
+              onDeleteAgent(agent.id)
             }}
             icon={<DeleteRegular />}
             aria-label="Delete Agent"
@@ -102,7 +99,7 @@ const AgentCard: React.FC<AgentCardProps> = ({
           <Button
             onClick={(e) => {
               e.stopPropagation()
-              safeOnDuplicateAgent(agent.id)
+              onDuplicateAgent(agent.id)
             }}
             icon={<SquareMultipleRegular />}
             aria-label="Duplicate Agent"
