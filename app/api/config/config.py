@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     database_name: str = "state"
     issues_container: str = "issues"
     agents_container: str = "agents"
+    settings_container: str = "settings"
     feedback_container: str = "feedback"
     storage_account_url: str = ""
     storage_container_name: str = "documents"

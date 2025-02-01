@@ -38,6 +38,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
     } finally {
       setIsLoading(false)
     }
+    onCancel()
   }
 
   const handleCancel = () => {

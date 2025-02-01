@@ -43,6 +43,8 @@ class AgentsService:
         """
         try:
             logging.debug(f"Attempting to create agent: {agent}")
+            agent.name = agent.name.strip()
+            agent.type = agent.type.strip()
             existing_agents = await self.agents_repository.get_agents_by_name_and_type(agent.name, agent.type)
             if existing_agents:
                 logging.error(f"Agent with name '{agent.name}' and type '{agent.type}' already exists.")
@@ -90,7 +92,8 @@ class AgentsService:
         """
         try:
             logging.debug(f"Starting update for agent with ID: {agent_id}")
-
+            input_agent.name = input_agent.name.strip()
+            input_agent.type = input_agent.type.strip()
             self._validate_agent_id(agent_id)
             self._validate_input_agent(input_agent)
 

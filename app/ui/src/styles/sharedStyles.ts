@@ -23,6 +23,11 @@ export const sharedStyles = makeStyles({
         maxWidth: '100%',
         height: '260px'
     },
+    bottomLeftButtonContainer: {
+        position: 'absolute',
+        bottom: '16px',
+        right: '16px'
+    },
     selected: {
         backgroundColor: tokens.colorNeutralBackground5,
         color: tokens.colorNeutralForeground1,

@@ -6,7 +6,7 @@ from middleware.logging import LoggingMiddleware
 from config.config import settings
 from fastapi.staticfiles import StaticFiles
 from middleware.logging import LoggingMiddleware, setup_logging
-from routers import issues, agents
+from routers import issues, agents, settings as agent_settings
 
 
 # Set up logging configuration
@@ -36,6 +36,7 @@ app.add_middleware(
 # Include routers
 app.include_router(issues.router)
 app.include_router(agents.router)
+app.include_router(agent_settings.router)
 
 # Health check endpoint
 @app.get(

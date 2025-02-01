@@ -198,3 +198,45 @@ export async function deleteAgent(id: string) {
     throw error;
   }
 }
+
+export async function getSettings() {
+  try {
+    const response = await callApi('admin/settings/');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail?.description || 'Failed to fetch settings.');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    throw error;
+  }
+}
+
+export async function addSetting(setting: { name: string; value: string }) {
+  try {
+    const response = await callApi('admin/settings/', 'POST', setting);
+    if (response.status === 201) {
+      return response.json();
+    }
+    const errorData = await response.json();
+    throw new Error(errorData.detail?.description || 'Failed to add setting.');
+  } catch (error) {
+    console.error('Error adding setting:', error);
+    throw error;
+  }
+}
+
+export async function deleteSetting(name: string) {
+  try {
+    const response = await callApi(`admin/settings/${name}`, 'DELETE');
+    if (response.status === 204) {
+      return { message: 'Setting deleted successfully' };
+    }
+    const errorData = await response.json();
+    throw new Error(errorData.detail?.description || 'Failed to delete setting.');
+  } catch (error) {
+    console.error('Error deleting setting:', error);
+    throw error;
+  }
+}
