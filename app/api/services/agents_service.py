@@ -43,6 +43,8 @@ class AgentsService:
         """
         try:
             logging.debug(f"Attempting to create agent: {agent}")
+            agent.name = agent.name.strip()
+            agent.type = agent.type.strip()
             existing_agents = await self.agents_repository.get_agents_by_name_and_type(agent.name, agent.type)
             if existing_agents:
                 logging.error(f"Agent with name '{agent.name}' and type '{agent.type}' already exists.")
@@ -52,7 +54,7 @@ class AgentsService:
                 **agent.model_dump(),
                 id=str(uuid.uuid4()),
                 created_at_UTC=datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                created_by=user.oid
+                created_by="user.oid"
             )
             created_agent = await self.agents_repository.create_agent(new_agent)
             logging.info(f"Agent created successfully with ID: {new_agent.id}")
@@ -90,7 +92,8 @@ class AgentsService:
         """
         try:
             logging.debug(f"Starting update for agent with ID: {agent_id}")
-
+            input_agent.name = input_agent.name.strip()
+            input_agent.type = input_agent.type.strip()
             self._validate_agent_id(agent_id)
             self._validate_input_agent(input_agent)
 
@@ -153,6 +156,6 @@ class AgentsService:
                 "guideline_prompt": input_agent.guideline_prompt
             }.items() if value
         }
-        update_fields["updated_by"] = user.oid
+        update_fields["updated_by"] = "user.oid"
         update_fields["updated_at_UTC"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
         return update_fields

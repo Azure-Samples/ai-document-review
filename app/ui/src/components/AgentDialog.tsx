@@ -61,11 +61,6 @@ const componentSyles = makeStyles({
     height: '250px',
     overflowY: 'auto'
   },
-  bottomLeftButtonContainer: {
-    position: 'absolute',
-    bottom: '16px',
-    right: '16px'
-  },
   dialogSurface: {
     paddingBottom: '64px',
     minHeight: '625px',
@@ -287,7 +282,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
               </Tooltip>
             </div>
           </DialogContent>
-          <DialogActions className={componentClasses.bottomLeftButtonContainer}>
+          <DialogActions className={sharedClasses.bottomLeftButtonContainer}>
             {localMode != 'view' && (
               <Button
                 onClick={handleSave}

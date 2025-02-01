@@ -424,3 +424,13 @@ resource "azurerm_cosmosdb_sql_container" "agents" {
 
   partition_key_paths = ["/id"]
 }
+
+resource "azurerm_cosmosdb_sql_container" "settings" {
+  name                = "settings"
+  resource_group_name = azurerm_cosmosdb_sql_database.state.resource_group_name
+
+  account_name  = azurerm_cosmosdb_account.main.name
+  database_name = azurerm_cosmosdb_sql_database.state.name
+
+  partition_key_paths = ["/id"]
+}

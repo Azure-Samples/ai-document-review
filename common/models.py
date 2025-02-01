@@ -148,8 +148,34 @@ class UpdateAgent(BaseModel):
             return validate_text(value, long_text_max_length)
         return value
 
+class Setting(BaseModel):
+    id: str
+    name: str
+    value: str
+    created_by: str
+    created_at_UTC: str
 
-def validate_text(value, length_limit):
+    @field_validator("name")
+    def validate_name(cls, value):
+        return validate_text(value, text_max_length, "_-")
+    
+    @field_validator("value")
+    def validate_value(cls, value):
+        return validate_text(value, long_text_max_length, "_-")
+
+class CreateSetting(BaseModel):
+    name: str
+    value: str
+
+    @field_validator("name")
+    def validate_name(cls, value):
+        return validate_text(value, text_max_length, "_-")
+
+    @field_validator("value")
+    def validate_value(cls, value):
+        return validate_text(value, long_text_max_length, "_-")
+
+def validate_text(value, length_limit, validChars=allowed_special_characters):
     """
     Validate the text value.
     
@@ -168,7 +194,7 @@ def validate_text(value, length_limit):
     text_length = len(value.strip())
     if text_length == 0 or text_length > length_limit:
         raise ValueError(f"Value must be between 1 to {length_limit} characters long.")
-    disallowed_pattern = r"[^\w\s" + re.escape(allowed_special_characters) + "]"
+    disallowed_pattern = r"[^\w\s" + re.escape(validChars) + "]"
     if re.search(disallowed_pattern, value):
         raise ValueError(f"Value contains disallowed special characters.")
     return value
