@@ -179,7 +179,7 @@ const SettingDialog: React.FC<AddSettingFormProps> = ({ isOpen, onDone }) => {
               aria-label="Save Setting"
               onClick={handleSaveSetting}
               appearance="primary"
-              disabled={hasClientError || !currentSetting.name || !currentSetting.value}
+              disabled={loading || hasClientError || !currentSetting.name || !currentSetting.value}
               icon={loading ? <Spinner size="tiny" /> : <SaveRegular />}
             >
               {loading ? 'Saving...' : 'Save'}

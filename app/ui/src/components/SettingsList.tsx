@@ -54,6 +54,8 @@ const SettingsList: React.FC = () => {
       setSettingToBeDeleted('')
     } catch (error) {
       console.error('Error deleting setting:', error)
+      setOpenDialog(false)
+      setError(`Failed to delete setting! ${error}`)
     }
   }
 

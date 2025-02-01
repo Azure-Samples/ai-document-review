@@ -204,7 +204,7 @@ export async function getSettings() {
     const response = await callApi('admin/settings/');
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || 'Failed to fetch settings.');
+      throw new Error(errorData.detail?.description || 'Failed to fetch settings.');
     }
     return response.json();
   } catch (error) {
@@ -234,7 +234,7 @@ export async function deleteSetting(name: string) {
       return { message: 'Setting deleted successfully' };
     }
     const errorData = await response.json();
-    throw new Error(errorData.detail || 'Failed to delete setting.');
+    throw new Error(errorData.detail?.description || 'Failed to delete setting.');
   } catch (error) {
     console.error('Error deleting setting:', error);
     throw error;
