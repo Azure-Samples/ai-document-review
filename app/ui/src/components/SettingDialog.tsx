@@ -27,17 +27,17 @@ const componentStyles = makeStyles({
   settingDialog: {
     minHeight: '250px',
     width: '400px',
-        padding: '20px',
-    paddingBottom: '60px',
+    padding: '20px',
+    paddingBottom: '60px'
   },
   field: {
-    width: '360px',
+    width: '360px'
   },
   saveButton: {
     marginTop: '20px',
     position: 'absolute',
     right: '16px',
-    bottom: '16px',
+    bottom: '16px'
   }
 })
 
@@ -81,7 +81,11 @@ const SettingDialog: React.FC<AddSettingFormProps> = ({ isOpen, onDone }) => {
   }
 
   const validateSettingString = (str: string, fieldName: string) => {
-    return validateNotEmpty(str, fieldName) || validateMaxLength(str, fieldName) || validateFormat(str, fieldName)
+    return (
+      validateNotEmpty(str, fieldName) ||
+      validateMaxLength(str, fieldName) ||
+      validateFormat(str, fieldName)
+    )
   }
 
   const handleInputChange = (input: string, field: 'name' | 'value') => {
@@ -143,7 +147,11 @@ const SettingDialog: React.FC<AddSettingFormProps> = ({ isOpen, onDone }) => {
             disabled={loading}
           />
           <div>
-            {error && <ErrorMessage title="Error!" message={error} />}
+            {error && (
+              <div className={componentClasses.field}>
+                <ErrorMessage title="Error!" message={error} />
+              </div>
+            )}
             <Field className={componentClasses.field} required label="Name">
               <Input
                 id="setting-name"
@@ -160,7 +168,7 @@ const SettingDialog: React.FC<AddSettingFormProps> = ({ isOpen, onDone }) => {
                 id="setting-value"
                 aria-label="Setting Value"
                 required
-                placeholder={"e.g. 'batch_size'"}
+                placeholder={"e.g. '21'"}
                 onChange={(e) => handleValueInputChange(e, 'value')}
                 value={currentSetting.value}
               />
