@@ -9,7 +9,8 @@ import {
   TableHeaderCell,
   TableCellLayout,
   Button,
-  Spinner
+  Spinner,
+  makeStyles
 } from '@fluentui/react-components'
 import { DeleteRegular, SettingsRegular } from '@fluentui/react-icons'
 import { Setting } from '../types/setting'
@@ -24,6 +25,20 @@ const columns = [
   { columnKey: 'action', label: 'Action' }
 ]
 
+const componentStyles = makeStyles({
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '20px'
+  },
+  settingList: {
+    maxWidth: '800px',
+    width: '100%',
+    margin: '20px',
+    marginLeft: '30px'
+  }
+})
+
 const SettingsList: React.FC = () => {
   const [settings, setSettings] = useState<Setting[]>([])
   const [error, setError] = useState('')
@@ -31,9 +46,12 @@ const SettingsList: React.FC = () => {
   const [settingToBeDeleted, setSettingToBeDeleted] = useState('')
   const [loading, setLoading] = useState(true)
 
+  const componentClasses = componentStyles()
+
   async function fetchSettings() {
     try {
       setLoading(true)
+      setError('')
       const data = await getSettings()
       if (data.length === 0) setError('No Settings found.')
       setSettings(data)
@@ -53,8 +71,6 @@ const SettingsList: React.FC = () => {
       setSettings((prevSettings) => prevSettings.filter((setting) => setting.id !== id))
       setSettingToBeDeleted('')
     } catch (error) {
-      console.error('Error deleting setting:', error)
-      setOpenDialog(false)
       setError(`Failed to delete setting! ${error}`)
     }
   }
@@ -65,8 +81,8 @@ const SettingsList: React.FC = () => {
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-      <div style={{ maxWidth: '800px', width: '100%', margin: '20px', marginLeft: '30px' }}>
+    <div className={componentClasses.root}>
+      <div className={componentClasses.settingList}>
         <Button
           onClick={() => {
             setOpenDialog(true)
@@ -76,12 +92,20 @@ const SettingsList: React.FC = () => {
         >
           Add New Setting
         </Button>
-        {error && <ErrorMessage title="Error!" message={error} onClose={() => {setError('')}} />}
-        { loading &&
-              <div>
-                <Spinner style={{ padding: '20px' }} size="large" />
-              </div>
-            }
+        {error && (
+          <ErrorMessage
+            title="Error!"
+            message={error}
+            onClose={() => {
+              setError('')
+            }}
+          />
+        )}
+        {loading && (
+          <div>
+            <Spinner style={{ padding: '20px' }} size="large" />
+          </div>
+        )}
         {openDialog && <SettingDialog isOpen={openDialog} onDone={handleDialogclose} />}
         <Table aria-label="Settings Table" style={{ width: '100%' }}>
           <TableHeader>
@@ -93,7 +117,7 @@ const SettingsList: React.FC = () => {
           </TableHeader>
           <TableBody>
             {settings.map((setting) => (
-              <TableRow key={setting.name}>
+              <TableRow key={setting.id}>
                 <TableCell tabIndex={0} role="gridcell">
                   <TableCellLayout media={<SettingsRegular />}>{setting.name}</TableCellLayout>
                 </TableCell>

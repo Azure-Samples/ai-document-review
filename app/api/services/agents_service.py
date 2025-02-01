@@ -54,7 +54,7 @@ class AgentsService:
                 **agent.model_dump(),
                 id=str(uuid.uuid4()),
                 created_at_UTC=datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                created_by="user.oid"
+                created_by=user.oid
             )
             created_agent = await self.agents_repository.create_agent(new_agent)
             logging.info(f"Agent created successfully with ID: {new_agent.id}")
@@ -156,6 +156,6 @@ class AgentsService:
                 "guideline_prompt": input_agent.guideline_prompt
             }.items() if value
         }
-        update_fields["updated_by"] = "user.oid"
+        update_fields["updated_by"] = user.oid
         update_fields["updated_at_UTC"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
         return update_fields

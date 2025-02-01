@@ -17,12 +17,12 @@ class SettingsRepository:
         """
         self.db_client = CosmosDBClient(app_config_settings.settings_container)
     
-    async def get_all_settings(self) -> Dict[str, Any]:
+    async def get_all_settings(self) -> List[Setting]:
         """
         Retrieve all settings.
 
         Returns:
-            Dict[str, Any]: A dictionary of all settings stored in the repository.
+            List[Setting]: A list of all settings.
         """
         logging.info("Retrieving all settings.")
         settings = await self.db_client.retrieve_items()
@@ -43,6 +43,8 @@ class SettingsRepository:
             Setting: The newly created setting.
         """
         logging.info(f"Creating setting: {setting}")
+        if not setting.name or not setting.value:
+            raise ValueError("Both 'name' and 'value' fields must be provided.")
         new_setting_data = await self.db_client.store_item(setting.model_dump())
         new_setting = Setting(**new_setting_data)
         logging.info(f"Setting created successfully with name: {new_setting.name}")

@@ -20,7 +20,7 @@ logging = get_logger(__name__)
     },
 )
 async def get_settings(
-    user={"oid": "1234"},
+    user=Depends(validate_authenticated),
     settings_service=Depends(get_settings_service)
 ) -> List[Setting]:
     """
@@ -54,7 +54,7 @@ async def get_settings(
 )
 async def create_setting(
     setting: CreateSetting,
-    user={},
+    user=Depends(validate_authenticated),
     settings_service=Depends(get_settings_service)
 ) -> str:
     """
@@ -70,7 +70,7 @@ async def create_setting(
     """
     try:
         created_setting = await settings_service.create_setting(setting, user)
-        return JSONResponse(status_code=201, content=created_setting.dict())
+        return JSONResponse(status_code=201, content=created_setting.model_dump())
     except ValueError as exc:
         raise HTTPException(status_code=400, detail={"description": str(exc)})     
     except ConflictError as ex:
@@ -92,7 +92,7 @@ async def create_setting(
 )
 async def delete_setting(
     setting_id: str,
-    user={},
+    user=Depends(validate_authenticated),
     settings_service=Depends(get_settings_service)
 ):
     """

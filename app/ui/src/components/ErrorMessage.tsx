@@ -26,7 +26,7 @@ const componentSyles = makeStyles({
 const ErrorMessage = ({ title, message, onClose }: ErrorMessageProps) => {
   const componentClasses = componentSyles()
   return (
-    <MessageBar  intent="error">
+    <MessageBar intent="error">
       <div className={componentClasses.messageBar}>
         <MessageBarBody style={{ flexGrow: 1 }}>
           <MessageBarTitle>{title}</MessageBarTitle>

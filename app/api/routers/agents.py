@@ -20,7 +20,7 @@ logging = get_logger(__name__)
     },
 )
 async def get_agents(
-    user={"oid": "1234"},
+    user=Depends(validate_authenticated),
     agents_service=Depends(get_agents_service)
 ) -> List[Agent]:
     """
@@ -54,7 +54,7 @@ async def get_agents(
 )
 async def create_agent(
     agent: CreateAgent,
-    user={},
+    user=Depends(validate_authenticated),
     agents_service=Depends(get_agents_service)
 ) -> str:
     """
@@ -92,7 +92,7 @@ async def create_agent(
 )
 async def delete_agent(
     agent_id: str,
-    user={},
+    user=Depends(validate_authenticated),
     agents_service=Depends(get_agents_service)
 ):
     """
@@ -128,7 +128,7 @@ async def delete_agent(
 async def update_agent(
     agent_id: str,
     agent: UpdateAgent,
-    user={},
+    user=Depends(validate_authenticated),
     agents_service=Depends(get_agents_service)
 ):
     """

@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 import {
   Button,
   Dialog,
-  DialogActions,
   DialogBody,
   DialogSurface,
   DialogTitle,
@@ -116,6 +115,7 @@ const SettingDialog: React.FC<AddSettingFormProps> = ({ isOpen, onDone }) => {
     }
 
     try {
+      setError('')
       setLoading(true)
       await addSetting(currentSetting)
       onDone()
