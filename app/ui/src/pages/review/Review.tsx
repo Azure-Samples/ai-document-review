@@ -12,6 +12,7 @@ import { getBlob } from '../../services/storage';
 import { AgentConfig } from '../../types/agent-config';
 import { APIEvent } from '../../types/api-events';
 import { Issue, IssueStatus } from '../../types/issue';
+import ErrorMessage from '../../components/ErrorMessage';
 
 // https://github.com/wojtekmaj/react-pdf?tab=readme-ov-file#configure-pdfjs-worker
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -335,12 +336,8 @@ function Review() {
       </div>
       <Card className={classes.sidebar}>
         {
-          checkError && <MessageBar intent="error" className={classes.errorMsg}>
-            <MessageBarBody>
-              <MessageBarTitle>Error running check</MessageBarTitle>
-                { checkError }
-            </MessageBarBody>
-          </MessageBar>
+          checkError && 
+          <ErrorMessage title="Error running check" message={checkError} />
         }
         {
           docId && <Button
