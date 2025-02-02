@@ -1,4 +1,4 @@
-fastapi[standard] == 0.112.0
+fastapi[standard] == 0.115.8
 pydantic==2.8.2
 azure-identity==1.19.0
 pydantic-settings==2.4.0
