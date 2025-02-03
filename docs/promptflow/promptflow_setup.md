@@ -45,20 +45,14 @@ Make sure to follow the steps outlined in [the Getting Started guide](../getting
    az login
    ```
 
-1. In the `flows` directory, create a .env file with the following content:
-
-   ```
-   AI_HUB_PROJECT_NAME=<azure ai project name>
-   SUBSCRIPTION_ID=<subscription ID>
-   RESOURCE_GROUP=<resource group name>
-   ```
+1. After running the `task infra-deploy` command, you should have a `.env` file in your `./flows` directory that contains the necessary details of your AI Foundry deployment.
 
 ## Deploy flow
 
 1. From the root of the repo, deploy the flow using the following command:
 
    ```
-   task deploy-flow
+   task flow-create-review
    ```
 
    At the end of the output, you will see a link to the Portal UI.
@@ -74,7 +68,7 @@ Make sure to follow the steps outlined in [the Getting Started guide](../getting
 1. To deploy the evaluation flow, use the following command:
 
    ```
-   task deploy-eval-flow
+   task flow-create-eval
    ```
 
    For working with the evaluation flow, refer to the separate [document](./evaluation_flow.md).
@@ -82,7 +76,7 @@ Make sure to follow the steps outlined in [the Getting Started guide](../getting
 1. You can also deploy the agent flow template separately. This is useful if you want to test new prompts for a new agent you are developing. For more information, see [the agent design](./agent_design.md).
 
    ```
-   task deploy-agent-flow
+   task flow-create-agent
    ```
 
 ## Local development with PromptFlow
