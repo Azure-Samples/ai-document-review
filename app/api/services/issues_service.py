@@ -52,7 +52,7 @@ class IssuesService:
             logging.info(f"Initiating review for document {pdf_name}")
 
             # Initiate review to get a stream of issues
-            stream_data = self.aml_client.call_aml_endpoint(settings.flow_endpoint_name, pdf_name)
+            stream_data = await self.aml_client.call_aml_endpoint(settings.flow_endpoint_name, pdf_name)
             async for chunk in stream_data:
                 flow_output = FlowOutputChunk.model_validate_json(chunk)
                 issues = [
@@ -71,8 +71,12 @@ class IssuesService:
                 yield issues
 
         except Exception as e:
-            logging.error(f"Error initiating review for document {pdf_name}: {str(e)}")
-            raise
+            if hasattr(e, "errors"):
+                error_details = e.errors()
+                logging.error("Error validating JSON chunk: %s", error_details)
+            else:
+                logging.error(f"Error initiating review for document {pdf_name}: {str(e)}")
+            raise e
 
 
     async def accept_issue(

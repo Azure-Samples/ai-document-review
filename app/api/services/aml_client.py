@@ -19,8 +19,8 @@ class AMLClient:
         Calls the flow endpoint with the name and data.
 
         Args:
-            name (str): The name of the flow endpoint.
-            data (str): The body of the request.
+            endpoint_name (str): The name of the flow endpoint.
+            pdf_name (str): The filename of the PDF in storage.
         """
 
         # Get the scoring URI and API key
