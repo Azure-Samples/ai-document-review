@@ -1,5 +1,5 @@
 import { Button, Caption1, Card, CardHeader, CounterBadge, Divider, Field, MessageBar, MessageBarBody, MessageBarTitle, Skeleton, SkeletonItem, Spinner, Tag, TagPicker, TagPickerControl, TagPickerGroup, TagPickerInput, TagPickerList, TagPickerOnOptionSelectData, TagPickerOption, TagPickerProps, Toolbar, ToolbarButton, makeStyles } from '@fluentui/react-components';
-import { CheckmarkFilled, ChevronDown16Regular, ChevronUp16Regular, Eye20Regular, EyeOff20Regular } from '@fluentui/react-icons';
+import { ArrowCounterclockwiseFilled, CheckmarkFilled, ChevronDown16Regular, ChevronUp16Regular, Eye20Regular, EyeOff20Regular } from '@fluentui/react-icons';
 import { SyntheticEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -73,19 +73,25 @@ function Review() {
   const classes = useStyles();
   const [searchParams] = useSearchParams();
 
+  const canRerun = import.meta.env.VITE_ALLOW_RERUN_CHECK! === 'true';
+
   const checkButtonIcon =
-    checkInProgress ? (
-      <Spinner size="tiny" />
-    ) : checkComplete ?
-      <CheckmarkFilled /> :
-      undefined;
+    checkInProgress
+      ? <Spinner size="tiny" />
+      : checkComplete
+        ? canRerun
+          ? <ArrowCounterclockwiseFilled />
+          : <CheckmarkFilled />
+        : undefined;
   
   const checkButtonContent =
     checkInProgress
       ? "Checking..."
-      : checkComplete ?
-        "Check complete" :
-        "Run check";
+      : checkComplete
+        ? canRerun
+          ? "Re-run check"
+          : "Check complete"
+        : "Run check";
 
   // Callback on PDF load success
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
@@ -345,7 +351,7 @@ function Review() {
         {
           docId && <Button
             className={classes.checkButton}
-            disabledFocusable={checkInProgress || checkComplete}
+            disabledFocusable={checkInProgress || (checkComplete && !canRerun)}
             appearance='outline'
             icon={checkButtonIcon}
             size="large"
