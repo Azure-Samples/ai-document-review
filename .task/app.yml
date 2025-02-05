@@ -100,3 +100,22 @@ tasks:
       - |
         echo -e "\033[0;32mLaunching API...\033[0m"
         .venv/bin/python3 -m uvicorn main:app --reload
+
+  api-test-deps:
+    desc: Install dependencies for pytest
+    silent: true
+    dir: ./tests/api
+    cmds: 
+      - |
+        echo -e "\033[0;32mInstalling pytest dependencies...\033[0m"
+        python3 -m venv .venv
+        .venv/bin/pip3 install -r requirements.txt
+
+  api-test:
+    desc: Run API unit tests
+    silent: true
+    dir: ./
+    cmds:
+    - |
+      echo -e "\033[0;32mRunning API tests...\033[0m"
+      ./tests/api/.venv/bin/pytest tests/api

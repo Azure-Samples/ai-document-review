@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     aad_tenant_id: str = ""
     aad_user_impersonation_scope_id: str = ""
     azure_client_id: str = ""
-    serve_static: bool = True
+    serve_static: bool = False
     cosmos_url: str = ""
     cosmos_key: str = ""
     database_name: str = "state"
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     flow_endpoint_name: str = ""
     flow_app_name: str = ""
     flow_streaming_batch_size: int = 100
-    appinsights_instrumentation_key: str = ""
+    appinsights_instrumentation_key: str = "00000000-0000-0000-0000-000000000000"
     log_level: str = "INFO"
     model_config = SettingsConfigDict(env_file=".env")
 

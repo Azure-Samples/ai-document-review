@@ -62,6 +62,12 @@ jobs:
         env:
           CI: false
 
+      - name: Test Application
+        id: app-test
+        run: task api-test-deps && task api-test
+        env:
+          CI: false
+
   flow:
     name: Flow
     runs-on: ubuntu-latest

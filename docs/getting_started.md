@@ -104,13 +104,9 @@ The project supports deploying flows automatically using predefined Taskfile com
 task flow-deploy
 ```
 
-This will deploy the flow code from the `flows` directory to the PromptFlow service in Azure AI Foundry. Once completed, you can then deploy an endpoint where the flow can be hosted and called:
+This will deploy the flow code from the `flows` directory to Azure App Service.
 
-```bash
-task flow-deploy-endpoint
-```
-
-> Note: this will take a few minutes to complete. You can view progress in the `Models + Endpoints` section of the project in [Azure AI Foundry](https://ai.azure.com).
+To run the flow locally, or deploy to AI foundry to run interactively, see [promptflow_setup.md](./promptflow/promptflow_setup.md).
 
 ### Access the Application
 
