@@ -166,8 +166,15 @@ function Review() {
   };
 
   // Run check by opening stream with API and handling incoming events
-  const runCheck = useCallback(() => {
+  const runCheck = useCallback((rerun: boolean = false) => {
     if (docId) {
+      let uri = `${docId}/issues`;
+      if (rerun) {
+        uri += '?rerun=true';
+        setIssues([]);
+        // todo: clear annotations
+      }
+  
       setCheckInProgress(true);
       setCheckError(undefined);
       setCheckComplete(false);
@@ -175,7 +182,7 @@ function Review() {
       abortControllerRef.current = new AbortController();
 
       streamApi(
-        `${docId}/issues`,
+        uri,
         (msg) => {
           switch (msg.event) {
             case APIEvent.Issues: {
@@ -355,7 +362,7 @@ function Review() {
             appearance='outline'
             icon={checkButtonIcon}
             size="large"
-            onClick={runCheck}
+            onClick={() => runCheck(checkComplete && canRerun)}
           >
             {checkButtonContent}
           </Button>
