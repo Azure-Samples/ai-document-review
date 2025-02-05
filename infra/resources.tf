@@ -281,6 +281,7 @@ resource "azurerm_linux_web_app" "app" {
     "FLOW_STREAMING_BATCH_SIZE"       = 100
     "APPINSIGHTS_INSTRUMENTATION_KEY" = azurerm_application_insights.main.instrumentation_key
     "LOG_LEVEL"                       = "INFO"
+    "SERVE_STATIC"                    = "True"
   }
 
   logs {
