@@ -7,7 +7,7 @@ environment_variables:
 environment:
   python_requirements_txt: requirements.txt
 additional_includes:
-- ../../common
+- ./common
 inputs:
   pdf_name:
     type: string

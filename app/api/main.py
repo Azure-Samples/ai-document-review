@@ -2,7 +2,6 @@ from common.logger import get_logger
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from middleware.logging import LoggingMiddleware
 from config.config import settings
 from fastapi.staticfiles import StaticFiles
 from middleware.logging import LoggingMiddleware, setup_logging
@@ -11,7 +10,6 @@ from routers import issues
 
 # Set up logging configuration
 setup_logging()
-
 logging = get_logger(__name__)
 
 # Initialize FastAPI app

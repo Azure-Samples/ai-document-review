@@ -1,4 +1,4 @@
-version: "3.40.1"
+version: "3.41.0"
 
 tasks:
   infra-init:
@@ -10,8 +10,9 @@ tasks:
       - ii
     dir: infra
     cmds:
-      - echo -e "\033[0;32mInitialising Terraform...\033[0m"
-      - terraform init
+      - |
+        echo -e "\033[0;32mInitialising Terraform...\033[0m"
+        terraform init
 
   infra-plan:
     desc: Plan infrastructure changes.
@@ -22,9 +23,9 @@ tasks:
       - ip
     dir: infra
     cmds:
-      - echo -e "\033[0;32mPlanning changes...\033[0m"
-      - terraform plan
-        -var-file=environments/local.tfvars
+      - |
+        echo -e "\033[0;32mPlanning changes...\033[0m"
+        terraform plan -var-file=environments/local.tfvars
 
   infra-deploy:
     desc: Deploy infrastructure.
@@ -35,10 +36,9 @@ tasks:
       - ia
     dir: infra
     cmds:
-      - echo -e "\033[0;32mApplying changes...\033[0m"
-      - terraform apply
-        -var-file=environments/local.tfvars
-        -auto-approve
+      - |
+        echo -e "\033[0;32mApplying changes...\033[0m"
+        terraform apply -var-file=environments/local.tfvars -auto-approve
 
   infra-destroy:
     desc: Destroy infrastructure.
@@ -49,44 +49,21 @@ tasks:
       - id
     dir: infra
     cmds:
-      - echo -e "\033[0;32mDestroying resources...\033[0m"
-      - terraform destroy
-        -var-file=environments/local.tfvars
-        -auto-approve
+      - |
+        echo -e "\033[0;32mDestroying resources...\033[0m"
+        terraform destroy -var-file=environments/local.tfvars -auto-approve
 
-  infra-state-refresh:
-    desc: Refresh the state of all infrastructure.
+  infra-clean:
+    desc: Remove infrastructure artifacts.
     silent: true
     deps:
       - task: deps-setup
     aliases:
-      - isf
+      - ic
     dir: infra
     cmds:
-      - echo -e "\033[0;32mRefreshing state...\033[0m"
-      - terraform refresh
-        -var-file=environments/local.tfvars
-
-  infra-state-reset:
-    desc: Reset the state of all infrastructure.
-    silent: true
-    deps:
-      - task: deps-setup
-    aliases:
-      - isr
-    dir: infra
-    cmds:
-      - echo -e "\033[0;32mResetting state...\033[0m"
-      - terraform state rm $(terraform state list) || true && rm -f terraform.tfstate*
-
-  infra-state-list:
-    desc: List all infrastructure state.
-    silent: true
-    deps:
-      - task: deps-setup
-    aliases:
-      - isl
-    dir: infra
-    cmds:
-      - echo -e "\033[0;32mListing state...\033[0m"
-      - terraform state list
+      - |
+        echo -e "\033[0;32mRemoving infrastructure artifacts...\033[0m"
+        rm -rf .terraform
+        rm -f terraform.tfstate
+        rm -f terraform.tfstate.backup
