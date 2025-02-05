@@ -1,5 +1,5 @@
 fastapi[standard] == 0.115.8
-pydantic==2.8.2
+pydantic==2.10.6
 azure-identity==1.19.0
 pydantic-settings==2.4.0
 azure-cosmos==4.9.0
