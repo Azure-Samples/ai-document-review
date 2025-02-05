@@ -1,65 +1,66 @@
 from azure.cosmos import CosmosClient
-from common.models import IssueType
-from typing import Optional, Dict, List, Any
+from typing import List
+from azure.cosmos import CosmosClient
+from azure.identity import DefaultAzureCredential
 
 
-# Hardcoded Cosmos DB details
-COSMOS_DB_ENDPOINT = "<cosmos-db-endpoint>"
-COSMOS_DB_KEY = "<cosmos-db-key>"
-DATABASE_NAME = "<database-name>"
-CONTAINER_NAME = "<container-name>"
+# Replace with your actual Cosmos DB endpoint
+COSMOS_DB_ENDPOINT = "https://cdb-adr14-env14.documents.azure.com:443/"
+DATABASE_NAME = "state"
+CONTAINER_NAME = "agents"
 
-async def retrieve_items_by_values(filters: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+def get_cosmos_client():
+    """Singleton-style helper to avoid recreating the Cosmos client using DefaultAzureCredential."""
+    credential = DefaultAzureCredential()
+    return CosmosClient(COSMOS_DB_ENDPOINT, credential=credential)
+
+def get_container():
+    """Get Cosmos DB container client."""
+    client = get_cosmos_client()
+    database = client.get_database_client(DATABASE_NAME)
+    return database.get_container_client(CONTAINER_NAME)
+
+
+
+def retrieve_distinct_agent_types() -> List[str]:
     """
-    Retrieve items from Cosmos DB container where specified columns match the given values.
-    This method will return the most recent prompt based on updated_at_UTC and if None, created_at_UTC.
-
-    :param filters: A dictionary where keys are column names and values are the values to match.
-    :return: A list of items matching the criteria, or None if an error occurs.
+    Retrieve distinct agent types from the Cosmos DB container,
+    getting the latest entry for each type based on updated_at_UTC or created_at_UTC.
     """
     try:
-        # Initialize Cosmos DB client
-        client = CosmosClient(COSMOS_DB_ENDPOINT, COSMOS_DB_KEY)
-        database = client.get_database_client(DATABASE_NAME)
-        container = database.get_container_client(CONTAINER_NAME)
-
-        # Construct the query dynamically based on the filters provided
-        filter_clauses = [f"c.{column}=@{column}" for column in filters.keys()]
-        query = f"SELECT * FROM c WHERE " + " AND ".join(filter_clauses)
-        parameters = [{"name": f"@{column}", "value": value} for column, value in filters.items()]
-        
-        # Execute the query
-        items = container.query_items(
-            query=query,
-            parameters=parameters,
-            enable_cross_partition_query=True,
-        )
-        
-        items_list = list(items)
-        
-        # Sort the items based on updated_at_UTC (if available) or created_at_UTC
-        items_list.sort(key=lambda x: x.get('updated_at_UTC', x.get('created_at_UTC')), reverse=True)
-
-        return items_list[0] if items_list else None
+        container = get_container()
+        query = """
+        SELECT DISTINCT VALUE c.type
+        FROM c 
+        WHERE c.type != null
+        """
+        result = container.query_items(query=query, enable_cross_partition_query=True)
+        return list(result)
     except Exception as e:
-        # TODO: Use default prompt if required
-        print(f"Error fetching items: {e}")
-        return None
+        print(f"Error fetching agent types: {e}")
+        return []
 
-async def fetch_prompt_from_db(issue_type: IssueType) -> str:
-    """
-    Fetch the latest prompt for a given issue type from Cosmos DB.
-    
-    :param issue_type: The type of issue (e.g., GrammarSpelling, DefinitiveLanguage)
-    :return: The prompt content as a string
-    """
-    filters = {
-        'type': issue_type.value,
-    }
 
-    # Fetch the prompt item from Cosmos DB
-    prompt_item = await retrieve_items_by_values(filters)
+async def fetch_latest_prompt_by_type(issue_type: str) -> str:
+    """
+    Fetch the latest prompt from Cosmos DB for a specific agent type.
     
-    if prompt_item:
-        return prompt_item.get('guideline_prompt', '') 
-    return '' 
+    :param issue_type: The agent type.
+    :return: The prompt content as a string.
+    """
+    try:
+        container = get_container()
+        query = """
+        SELECT * 
+        FROM c 
+        WHERE c.type = @type
+        ORDER BY c.updated_at_UTC DESC, c.created_at_UTC DESC
+        """
+        parameters = [{"name": "@type", "value": issue_type}]
+        items = container.query_items(query=query, parameters=parameters, enable_cross_partition_query=True)
+        
+        prompt_item = next(items, None)
+        return prompt_item.get('guideline_prompt', '') if prompt_item else ''
+    except Exception as e:
+        print(f"Error fetching prompt for type '{issue_type}': {e}")
+        return ''
