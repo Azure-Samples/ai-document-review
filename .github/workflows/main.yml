@@ -64,7 +64,7 @@ jobs:
 
       - name: Test Application
         id: app-test
-        run: task api-test-deps && task app-test
+        run: task api-test-deps && task api-test
         env:
           CI: false
 
