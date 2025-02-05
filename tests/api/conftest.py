@@ -30,7 +30,7 @@ def mock_issues_repo():
 
 @pytest.fixture(scope="function")
 def mock_aml_client():
-    with patch('services.aml_client.AMLClient', new_callable=AsyncMock) as mock:
+    with patch('services.aml_client.AMLClient') as mock:
         yield mock
 
 @pytest.fixture(scope="function")

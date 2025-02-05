@@ -4,6 +4,7 @@ from common.models import IssueType
 import json
 from services.issues_service import IssuesService
 
+
 class AMLStreamMock:
     def __init__(self, items: list):
         self._items = items
@@ -16,6 +17,7 @@ class AMLStreamMock:
         if not self._items:
             raise StopAsyncIteration
         return json.dumps(self._items.pop(0)) # return as json string
+
 
 @pytest.mark.asyncio
 async def test_get_issues_data(mock_issues_repo, mock_aml_client):

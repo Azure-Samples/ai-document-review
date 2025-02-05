@@ -52,7 +52,7 @@ class IssuesService:
             logging.info(f"Initiating review for document {pdf_name}")
 
             # Initiate review to get a stream of issues
-            stream_data = await self.aml_client.call_aml_endpoint(settings.flow_endpoint_name, pdf_name)
+            stream_data = self.aml_client.call_aml_endpoint(settings.flow_endpoint_name, pdf_name)
             async for chunk in stream_data:
                 flow_output = FlowOutputChunk.model_validate_json(chunk)
                 issues = [
