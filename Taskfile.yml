@@ -1,4 +1,4 @@
-version: "3.40.1"
+version: "3.41.0"
 
 dotenv: [".env", "flows/.env", "{{.HOME}}/.env"]
 
@@ -19,6 +19,8 @@ tasks:
   deps-check:
     desc: Check toolchain dependencies.
     silent: true
+    aliases:
+      - dc
     cmds:
       - echo -e "\033[0;32mChecking dependencies...\033[0m"
       - |
@@ -42,16 +44,6 @@ tasks:
           exit 1
         fi
       - |
-        if ! command -v mkcert > /dev/null; then
-          echo "Error: mkcert is not installed. Please install mkcert to continue."
-          exit 1
-        fi
-      - |
-        if ! command -v pfazure > /dev/null; then
-          echo "Error: pfazure is not installed. Please install pfazure to continue."
-          exit 1
-        fi
-      - |
         if ! command -v git > /dev/null; then
           echo "Error: git is not installed. Please install git to continue."
           exit 1
@@ -60,6 +52,8 @@ tasks:
   deps-install:
     desc: Install toolchain dependencies.
     silent: true
+    aliases:
+      - di
     cmds:
       - |
         if ! command -v az > /dev/null; then
@@ -125,7 +119,7 @@ tasks:
           sudo curl -fsSL https://raw.githubusercontent.com/tj/n/master/bin/n -o /opt/n
           sudo bash /opt/n install 22 > /dev/null
         else
-          NODE_VERSION=$(node -v | sed 's/v//;s/\..*//')
+          NODE_VERSION=$(node -v | sed "s/v//;s/\..*//")
           if [ "$NODE_VERSION" -ne 22 ]; then
             echo -e "\033[0;33mUpdating node...\033[0m"
             cd "$(mktemp -d)" || exit 1
@@ -137,35 +131,17 @@ tasks:
             fi
           fi
         fi
-      - |
-        if ! command -v mkcert > /dev/null; then
-          echo -e "\033[0;32mInstalling mkcert...\033[0m"
-          cd "$(mktemp -d)" || exit 1
-
-          curl -sLf -o ./mkcert https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/mkcert-v1.4.4-linux-amd64
-          chmod +x mkcert
-          sudo mv mkcert /usr/local/bin/mkcert
-        fi
-      - |
-        if ! command -v pf > /dev/null; then
-          echo -e "\033[0;32mInstalling promptflow...\033[0m"
-          cd "$(mktemp -d)" || exit 1
-
-          sudo mkdir -p /opt/python3/venvs/promptflow
-          sudo python3 -m venv /opt/python3/venvs/promptflow
-          sudo /opt/python3/venvs/promptflow/bin/pip3 install promptflow promptflow-tools promptflow-azure --quiet
-          sudo ln -s /opt/python3/venvs/promptflow/bin/pf /usr/local/bin/pf
-          sudo ln -s /opt/python3/venvs/promptflow/bin/pfazure /usr/local/bin/pfazure
-        fi
 
   deps-setup:
     desc: Setup toolchain dependencies.
     silent: true
     deps:
       - deps-check
+    aliases:
+      - ds
     cmds:
-    - echo -e "\033[0;32mSetting up environment...\033[0m"
     - |
+      echo -e "\033[0;32mSetting up environment...\033[0m"
       if [ ! -z "$SKIP_DEPS_SETUP" ]; then
           echo "SKIP_DEPS_SETUP is set. Skipping environment setup."
           exit 0
@@ -178,6 +154,7 @@ tasks:
 
       feature_state=$(az feature show --name AllowNSPInPublicPreview --namespace Microsoft.Network --query 'properties.state' -o tsv)
       if [ "$feature_state" == "NotRegistered" ]; then
-          echo "Registering feature 'AllowNSPInPublicPreview'..."
+          echo "Registering feature '
+          AllowNSPInPublicPreview'..."
           az feature register --name AllowNSPInPublicPreview --namespace Microsoft.Network --only-show-errors
       fi

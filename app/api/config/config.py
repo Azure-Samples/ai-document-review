@@ -8,7 +8,8 @@ class Settings(BaseSettings):
     aad_client_id: str = ""
     aad_tenant_id: str = ""
     aad_user_impersonation_scope_id: str = ""
-    serve_static: bool = True
+    azure_client_id: str = ""
+    serve_static: bool = False
     cosmos_url: str = ""
     cosmos_key: str = ""
     database_name: str = "state"
@@ -21,9 +22,10 @@ class Settings(BaseSettings):
     resource_group: str = ""
     ai_hub_project_name: str = ""
     ai_hub_region: str = ""
-    aml_endpoint_name: str = ""
-    aml_streaming_batch_size: int = 10
-    appinsights_instrumentation_key: str = ""
+    flow_endpoint_name: str = ""
+    flow_app_name: str = ""
+    flow_streaming_batch_size: int = 100
+    appinsights_instrumentation_key: str = "00000000-0000-0000-0000-000000000000"
     log_level: str = "INFO"
     model_config = SettingsConfigDict(env_file=".env")
 

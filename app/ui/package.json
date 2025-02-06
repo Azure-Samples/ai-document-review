@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "@azure/core-auth": "^1.9.0",
-    "@azure/identity": "^4.5.0",
+    "@azure/identity": "^4.6.0",
     "@azure/msal-browser": "^3.28.0",
     "@azure/msal-react": "^2.2.0",
     "@azure/storage-blob": "^12.26.0",
@@ -16,7 +16,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-pdf": "^9.1.1",
-    "react-router-dom": "^7.0.2"
+    "react-router-dom": "^7.1.3"
   },
   "scripts": {
     "start": "vite",
@@ -46,14 +46,14 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.14.5",
+    "@types/node": "^22.10.9",
     "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.17.0",
+    "eslint": "^9.18.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.18.2",
-    "vite": "^6.0.5"
+    "vite": "^6.0.11"
   }
 }

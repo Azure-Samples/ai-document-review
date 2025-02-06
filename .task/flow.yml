@@ -1,8 +1,8 @@
-version: "3.40.1"
+version: "3.41.0"
 
 tasks:
-  flow-deploy:
-    desc: Deploy flows to AI Foundry.
+  flow-create-review:
+    desc: Upload and create flows in AI Foundry.
     silent: true
     deps:
       - task: deps-setup
@@ -10,19 +10,22 @@ tasks:
       - fd
     dir: flows
     cmds:
-      - cmd: |
+      - |
           NAME_ARGUMENT={{if .FLOW_NAME}}"--set display_name="{{.FLOW_NAME}}{{else}}{{end}}
-          pushd ../infra > /dev/null
-          eval "$(terraform output -json | jq -r 'to_entries | .[] | "export ADR_" + (.key | ascii_upcase) + "=\"" + .value.value + "\"" ')"
-          popd > /dev/null
+          pushd ../infra
+          RESOURCE_GROUP=$(terraform output -raw resource_group)
+          APP_NAME=$(terraform output -raw webapp_name)
+          popd
+
+          cp -a ../common "ai_doc_review/common"
 
           pfazure flow create \
             --flow ai_doc_review \
-            --workspace-name "$ADR_AI_HUB_PROJECT_NAME" \
-            --resource-group "$ADR_RESOURCE_GROUP" \
+            --workspace-name "$AI_HUB_PROJECT_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
             $NAME_ARGUMENT
 
-  flow-deploy-agent:
+  flow-create-agent:
     desc: Deploy agent flows to AI Foundry.
     silent: true
     deps:
@@ -31,19 +34,20 @@ tasks:
       - fda
     dir: flows
     cmds:
-      - cmd: |
+      - |
           NAME_ARGUMENT={{if .FLOW_NAME}}"--set display_name="{{.FLOW_NAME}}{{else}}{{end}}
-          pushd ../infra > /dev/null
-          eval "$(terraform output -json | jq -r 'to_entries | .[] | "export ADR_" + (.key | ascii_upcase) + "=\"" + .value.value + "\"" ')"
-          popd > /dev/null
+          pushd ../infra
+          RESOURCE_GROUP=$(terraform output -raw resource_group)
+          AI_HUB_PROJECT_NAME=$(terraform output -raw ai_hub_project_name)
+          popd
 
           pfazure flow create \
             --flow ai_doc_review/agent_template \
-            --workspace-name "$ADR_AI_HUB_PROJECT_NAME" \
-            --resource-group "$ADR_RESOURCE_GROUP" \
+            --workspace-name "$AI_HUB_PROJECT_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
             $NAME_ARGUMENT
 
-  flow-deploy-eval:
+  flow-create-eval:
     desc: Deploy evaluation flows to AI Foundry.
     silent: true
     deps:
@@ -52,64 +56,103 @@ tasks:
       - fde
     dir: flows
     cmds:
-      - cmd: |
+      - |
           NAME_ARGUMENT={{if .FLOW_NAME}}"--set display_name="{{.FLOW_NAME}}{{else}}{{end}}
-          pushd ../infra > /dev/null
-          eval "$(terraform output -json | jq -r 'to_entries | .[] | "export ADR_" + (.key | ascii_upcase) + "=\"" + .value.value + "\"" ')"
-          popd > /dev/null
+          pushd ../infra
+          RESOURCE_GROUP=$(terraform output -raw resource_group)
+          AI_HUB_PROJECT_NAME=$(terraform output -raw ai_hub_project_name)
+          popd
 
           pfazure flow create \
             --flow ai_doc_review_eval \
-            --workspace-name "$ADR_AI_HUB_PROJECT_NAME" \
-            --resource-group "$ADR_RESOURCE_GROUP" \
+            --workspace-name "$AI_HUB_PROJECT_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
             --set type=evaluation
             $NAME_ARGUMENT
 
-  flow-deploy-endpoint:
-    desc: Deploy to ML endpoints.
+  flow-build:
+    desc: Build flow artifacts.
+    silent: true
+    deps:
+      - task: deps-setup
+    aliases:
+      - fb
+    dir: flows
+    cmds:
+      - |
+        echo -e "\033[0;32mBuilding flow artifacts...\033[0m"
+        python3 -m venv .venv
+        .venv/bin/pip3 install -r requirements.txt
+        .venv/bin/pip3 install -r ./ai_doc_review/requirements.txt
+        .venv/bin/pip3 install -r ./ai_doc_review_eval/requirements.txt
+        .venv/bin/pip3 install keyrings.alt
+
+  flow-clean:
+    desc: Remove flow artifacts.
+    silent: true
+    deps:
+      - task: deps-setup
+    aliases:
+      - fb
+    dir: flows
+    cmds:
+      - |
+        echo -e "\033[0;32mRemoving flow artifacts...\033[0m"
+        rm -rf .venv
+        rm -rf ai_doc_review/common
+
+  flow-deploy:
+    desc: Deploy flow endpoint to App Service.
     silent: true
     deps:
       - task: deps-setup
     aliases:
       - fde
-    dir: flows/ai_doc_review
+    dir: flows
     cmds:
       - cmd: |
-          pushd ../../infra > /dev/null
-          eval "$(terraform output -json | jq -r 'to_entries | .[] | "export ADR_" + (.key | ascii_upcase) + "=\"" + .value.value + "\"" ')"
-          popd > /dev/null
+          echo -e "\033[0;32mUploading flow...\033[0m"
+          TEMP_DIR=$(mktemp -d)
+          trap "rm -rf $TEMP_DIR" EXIT
 
-          cp -r ../../common/ common/
-          cp ./deployment.yaml ./sub_deployment.yaml
-          export MODEL_VERSION=$(az ml model create --workspace-name "$ADR_AI_HUB_PROJECT_NAME" --resource-group "$ADR_RESOURCE_GROUP" --file model.yaml --query version -o tsv)
+          cp -a ai_doc_review "$TEMP_DIR/"
+          rm -rf "$TEMP_DIR/ai_doc_review/common"
+          cp -a ../common "$TEMP_DIR/ai_doc_review/common"
+          pushd $TEMP_DIR/ai_doc_review
+          zip -q -r --symlinks "$TEMP_DIR/flow.zip" *
+          popd
 
-          sed -i 's|VAR_MODEL_VERSION|'"$MODEL_VERSION"'|g' sub_deployment.yaml
-          sed -i 's|VAR_SUBSCRIPTION_ID|'"$ADR_SUBSCRIPTION_ID"'|g' sub_deployment.yaml
-          sed -i 's|VAR_RESOURCE_GROUP|'"$ADR_RESOURCE_GROUP"'|g' sub_deployment.yaml
-          sed -i 's|VAR_AI_HUB_PROJECT_NAME|'"$ADR_AI_HUB_PROJECT_NAME"'|g' sub_deployment.yaml
-          sed -i 's|VAR_ENDPOINT_NAME|'"$ADR_AML_ENDPOINT_NAME"'|g' sub_deployment.yaml
-          sed -i 's|VAR_AZURE_OPENAI_ENDPOINT|'"$ADR_AZURE_OPENAI_ENDPOINT"'|g' sub_deployment.yaml
-          sed -i 's|VAR_IDENTITY_CLIENT_ID|'"$ADR_IDENTITY_CLIENT_ID"'|g' sub_deployment.yaml
-          sed -i 's|VAR_DOCUMENT_INTELLIGENCE_ENDPOINT|'"$ADR_DOCUMENT_INTELLIGENCE_ENDPOINT"'|g' sub_deployment.yaml
-          sed -i 's|VAR_STORAGE_URL_PREFIX|'"$ADR_STORAGE_URL_PREFIX"'|g' sub_deployment.yaml
+          pushd ../infra
+          RESOURCE_GROUP=$(terraform output -raw resource_group)
+          FLOW_NAME=$(terraform output -raw flowapp_name)
+          popd
 
-          az ml online-deployment show \
-              --name ai-doc-review-deployment \
-              --endpoint-name "$ADR_AML_ENDPOINT_NAME" \
-              --workspace-name "$ADR_AI_HUB_PROJECT_NAME" \
-              --resource-group "$ADR_RESOURCE_GROUP" \
-          && az ml online-deployment update \
-              --file sub_deployment.yaml \
-              --workspace-name "$ADR_AI_HUB_PROJECT_NAME" \
-              --resource-group "$ADR_RESOURCE_GROUP" \
-          || az ml online-deployment create \
-              --file sub_deployment.yaml \
-              --workspace-name "$ADR_AI_HUB_PROJECT_NAME" \
-              --resource-group "$ADR_RESOURCE_GROUP" \
-              --all-traffic
+          ZIP_PATH="$TEMP_DIR/flow.zip"
+          az webapp deploy \
+            -g $RESOURCE_GROUP \
+            -n $FLOW_NAME \
+            --src-path "$ZIP_PATH" \
+            --type zip
 
-          az ml online-endpoint update \
-            --name $ADR_AML_ENDPOINT_NAME \
-            --traffic "ai-doc-review-deployment=100" \
-            --workspace-name "$ADR_AI_HUB_PROJECT_NAME" \
-            --resource-group "$ADR_RESOURCE_GROUP"
+  flow-run:
+    desc: Launch local flow instance.
+    silent: true
+    deps:
+      - task: deps-setup
+    aliases:
+      - fr
+    dir: flows/ai_doc_review
+    cmds:
+      - |
+        echo -e "\033[0;32mLaunching flow...\033[0m"
+        pf flow serve --source ./ --port 8080 --host localhost
+
+  flow-logs:
+    desc: Show logs for ML endpoint.
+    silent: true
+    aliases:
+      - fle
+    dir: infra
+    cmds:
+      - |
+        az webapp log tail --name $(terraform output -raw flowapp_name) --resource-group $(terraform output -raw resource_group)
