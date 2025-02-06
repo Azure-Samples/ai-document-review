@@ -71,8 +71,12 @@ class IssuesService:
                 yield issues
 
         except Exception as e:
-            logging.error(f"Error initiating review for document {pdf_name}: {str(e)}")
-            raise
+            if hasattr(e, "errors"):
+                error_details = e.errors()
+                logging.error("Error validating JSON chunk: %s", error_details)
+            else:
+                logging.error(f"Error initiating review for document {pdf_name}: {str(e)}")
+            raise e
 
 
     async def accept_issue(
