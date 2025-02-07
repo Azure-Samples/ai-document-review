@@ -1,5 +1,4 @@
-from typing import Any, Callable, Generator, Tuple
-from prompt_service import fetch_latest_prompt_by_type, retrieve_distinct_agent_types
+from agents_service import fetch_latest_prompt_by_type
 from promptflow.core import tool
 from concurrent.futures import ThreadPoolExecutor as Pool
 from functools import partial
@@ -10,18 +9,14 @@ from common.models import AllCombinedIssues
 from text import analyze_document, get_text_chunks
 
 
-def run_flow(text: str, agent_type: str) -> Tuple[str, Any]:
-    """
-    Runs the flow for a given text chunk and agent type.
-    Fetches the guideline prompt for the agent type dynamically.
-    """
-    agent_prompt = fetch_latest_prompt_by_type(agent_type)
-    # Here you need to call the flow function for the text chunk using the prompt
-    # Assuming flow_function takes text and prompt as arguments
-    result = {
-        "agent_output": f"Processed text with agent type '{agent_type}' and prompt '{agent_prompt}'"
-    }
-    return agent_type, result
+def run_flow(flow: Tuple[IssueType, Callable], text: str) -> Tuple[IssueType, Any]:
+    issue_type, flow_function = flow
+    logging.info(f"Running flow for flow_function {issue_type.value}")
+    guideline_prompt = str(fetch_latest_prompt_by_type(issue_type.value))
+    if not guideline_prompt:
+        logging.error(f"Invalid guidline prompt found: {issue_type.value}")
+        raise ValueError(f"Guideline prompt not found for issue type: {issue_type.value}")
+    return issue_type, flow_function(text=text, guideline_prompt_text=guideline_prompt)
 
 
 def get_issues_from_text_chunks(pdf_name: str, pagination: int) -> Generator[Any, Any, Any]:
@@ -36,9 +31,11 @@ def get_issues_from_text_chunks(pdf_name: str, pagination: int) -> Generator[Any
                 agent_types
             )
 
+            logging.info(f"Processing agent results")
             for issue_type, agent_results in agent_flow_results:
                 output = AllCombinedIssues.model_validate_json(agent_results["agent_output"])
     
+                logging.info(f"Adding issue type and bounding box to issues")
                 for issue in output.issues:
                     issue.type = issue_type
                     try:

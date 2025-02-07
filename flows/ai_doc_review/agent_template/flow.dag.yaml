@@ -8,18 +8,14 @@ inputs:
   text:
     type: string
     is_chat_input: false
+  guideline_prompt_text:
+    type: string
+    is_chat_input: false
 outputs:
   agent_output:
     type: string
     reference: ${merge.output}
 nodes:
-- name: guidelines_prompt
-  type: prompt
-  source:
-    type: code
-    path: guidelines.jinja2
-  inputs: {}
-  use_variants: false
 - name: aggregate
   type: python
   source:
@@ -33,6 +29,8 @@ nodes:
   source:
     type: code
     path: consolidator.jinja2
+  inputs:
+    guidelines: ${inputs.guideline_prompt_text}
   use_variants: false
 - name: merge
   type: python
@@ -81,5 +79,5 @@ nodes:
     type: code
     path: agent.jinja2
   inputs:
-    guidelines: ${guidelines_prompt.output}
+    guidelines: ${inputs.guideline_prompt_text}
   use_variants: false
