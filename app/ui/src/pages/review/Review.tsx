@@ -1,5 +1,5 @@
 import { Button, Caption1, Card, CardHeader, CounterBadge, Divider, Field, MessageBar, MessageBarBody, MessageBarTitle, Skeleton, SkeletonItem, Spinner, Tag, TagPicker, TagPickerControl, TagPickerGroup, TagPickerInput, TagPickerList, TagPickerOnOptionSelectData, TagPickerOption, TagPickerProps, Toolbar, ToolbarButton, makeStyles } from '@fluentui/react-components';
-import { CheckmarkFilled, ChevronDown16Regular, ChevronUp16Regular, Eye20Regular, EyeOff20Regular } from '@fluentui/react-icons';
+import { ArrowCounterclockwiseFilled, CheckmarkFilled, ChevronDown16Regular, ChevronUp16Regular, Eye20Regular, EyeOff20Regular } from '@fluentui/react-icons';
 import { SyntheticEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -73,19 +73,25 @@ function Review() {
   const classes = useStyles();
   const [searchParams] = useSearchParams();
 
+  const canRerun = import.meta.env.VITE_ALLOW_RERUN_CHECK! === 'true';
+
   const checkButtonIcon =
-    checkInProgress ? (
-      <Spinner size="tiny" />
-    ) : checkComplete ?
-      <CheckmarkFilled /> :
-      undefined;
+    checkInProgress
+      ? <Spinner size="tiny" />
+      : checkComplete
+        ? canRerun
+          ? <ArrowCounterclockwiseFilled />
+          : <CheckmarkFilled />
+        : undefined;
   
   const checkButtonContent =
     checkInProgress
       ? "Checking..."
-      : checkComplete ?
-        "Check complete" :
-        "Run check";
+      : checkComplete
+        ? canRerun
+          ? "Re-run check"
+          : "Check complete"
+        : "Run check";
 
   // Callback on PDF load success
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
@@ -160,8 +166,15 @@ function Review() {
   };
 
   // Run check by opening stream with API and handling incoming events
-  const runCheck = useCallback(() => {
+  const runCheck = useCallback((rerun: boolean = false) => {
     if (docId) {
+      let uri = `${docId}/issues`;
+      if (rerun) {
+        uri += '?rerun=true';
+        setIssues([]);
+        // TODO: clear annotations
+      }
+  
       setCheckInProgress(true);
       setCheckError(undefined);
       setCheckComplete(false);
@@ -169,7 +182,7 @@ function Review() {
       abortControllerRef.current = new AbortController();
 
       streamApi(
-        `${docId}/issues`,
+        uri,
         (msg) => {
           switch (msg.event) {
             case APIEvent.Issues: {
@@ -345,11 +358,11 @@ function Review() {
         {
           docId && <Button
             className={classes.checkButton}
-            disabledFocusable={checkInProgress || checkComplete}
+            disabledFocusable={checkInProgress || (checkComplete && !canRerun)}
             appearance='outline'
             icon={checkButtonIcon}
             size="large"
-            onClick={runCheck}
+            onClick={() => runCheck(checkComplete)}
           >
             {checkButtonContent}
           </Button>

@@ -185,3 +185,19 @@ class IssuesService:
                 f"Failed to provide feedback on issue {issue_id}: {e}"
             )
             raise
+
+
+    async def delete_document_issues(self, doc_id: str) -> None:
+        """
+        Deletes all issues for a given document ID.
+
+        Args:
+            doc_id (str): Document ID
+        """
+        try:
+            logging.info(f"Deleting issues for document {doc_id}")
+            await self.issues_repository.delete_issues(doc_id)
+
+        except Exception as e:
+            logging.error(f"Error deleting issues for doc_id={doc_id}: {str(e)}")
+            raise e

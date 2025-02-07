@@ -21,7 +21,8 @@ const useStyles = makeStyles({
   dismissed: {
     backgroundColor: tokens.colorNeutralBackground2
   },
-  header: { height: '40px', textOverflow: 'ellipsis' },
+  header: { paddingTop: '10px', paddingBottom: '10px' },
+  hideOverflow: { width: '270px', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden'},
   footer: { paddingTop: '10px' },
   feedback: {
     backgroundColor: tokens.colorPaletteYellowBackground2,
@@ -144,7 +145,7 @@ export function IssueCard({ docId, issue, selected, onSelect, onUpdate }: IssueC
                 : <Circle20Filled primaryFill={tokens.colorNeutralBackground4} />
           }
           header={
-            <Caption1Strong strikethrough={issue.status === IssueStatus.Dismissed}>{ issue.text }</Caption1Strong>
+            <Caption1Strong className={!selected ? classes.hideOverflow : undefined} strikethrough={issue.status === IssueStatus.Dismissed}>{ issue.text }</Caption1Strong>
           }
         />
 

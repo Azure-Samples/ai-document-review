@@ -23,7 +23,7 @@ class IssuesRepository:
         """
         logging.info(f"Retrieving issues for document {doc_id}.")
         filter = { "doc_id": doc_id }
-        issues = await self.db_client.retrieve_items_by_values(filter)
+        issues = await self.db_client.retrieve_items_by_values(filter, doc_id)
         logging.info(f"Retrieved {len(issues)} issues for document {doc_id}.")
         return [Issue(**issue) for issue in issues]
 
@@ -73,3 +73,15 @@ class IssuesRepository:
             return Issue(**issue)
         else:
             raise ValueError(f"Issue {issue_id} not found.")
+
+
+    async def delete_issues(self, doc_id: str) -> None:
+        """
+        Delete issues for a given document id.
+
+        Args:
+            doc_id (str): The document id.
+        """
+        logging.info(f"Deleting issues for document {doc_id}.")
+        await self.db_client.delete_items_by_values({"doc_id": doc_id}, doc_id)
+        logging.info(f"Issues for document {doc_id} deleted.")
