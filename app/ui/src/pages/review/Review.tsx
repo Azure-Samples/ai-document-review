@@ -172,7 +172,7 @@ function Review() {
       if (rerun) {
         uri += '?rerun=true';
         setIssues([]);
-        // todo: clear annotations
+        // TODO: clear annotations
       }
   
       setCheckInProgress(true);
@@ -362,7 +362,7 @@ function Review() {
             appearance='outline'
             icon={checkButtonIcon}
             size="large"
-            onClick={() => runCheck(checkComplete && canRerun)}
+            onClick={() => runCheck(checkComplete)}
           >
             {checkButtonContent}
           </Button>
