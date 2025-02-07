@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config.config import settings
 from fastapi.staticfiles import StaticFiles
 from middleware.logging import LoggingMiddleware, setup_logging
-from routers import issues
+from routers import issues, agents
 
 
 # Set up logging configuration
@@ -33,7 +33,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(issues.router)
-
+app.include_router(agents.router)
 
 # Health check endpoint
 @app.get(

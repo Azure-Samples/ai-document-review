@@ -1,7 +1,12 @@
-from pydantic import BaseModel
+import re
+from pydantic import BaseModel, field_validator
 from enum import Enum
 from typing import Optional
 
+
+text_max_length = 50
+long_text_max_length = 5000
+allowed_special_characters = r"[\[\]\,\.\!\?\:\"\'\-\(\)\_\$\£\#\@\+\=\&\%\*\!\/]"
 
 class Location(BaseModel):
     source_sentence: str
@@ -92,3 +97,78 @@ class Issue(BaseModel):
 
     class Config:
         use_enum_values = True
+
+
+class Agent(BaseModel):
+    id: str
+    type: str
+    name: str
+    guideline_prompt: str
+    created_by: str
+    created_at_UTC: str
+    updated_by: Optional[str] = None
+    updated_at_UTC: Optional[str] = None
+
+    @field_validator("name", "type")
+    def validate_name_and_type(cls, value):
+        return validate_text(value, text_max_length)
+
+    @field_validator("guideline_prompt")
+    def validate_text(cls, value):
+        return validate_text(value, long_text_max_length)
+
+class CreateAgent(BaseModel):
+    name: str
+    guideline_prompt: str
+    type: str
+
+    @field_validator("name", "type")
+    def validate_name_and_type(cls, value):
+        return validate_text(value, text_max_length)
+
+    @field_validator("guideline_prompt")
+    def validate_guidelines_prompt(cls, value):
+        return validate_text(value, long_text_max_length)
+
+class UpdateAgent(BaseModel):
+    name: Optional[str] = None
+    type: Optional[str] = None
+    guideline_prompt: Optional[str] = None
+
+    
+    @field_validator("name", "type")
+    def validate_name_and_type(cls, value):
+        if value:
+            return validate_text(value, text_max_length)
+        return value
+
+    @field_validator("guideline_prompt")
+    def validate_text(cls, value):
+        if value:
+            return validate_text(value, long_text_max_length)
+        return value
+
+
+def validate_text(value, length_limit):
+    """
+    Validate the text value.
+    
+    Ensures that the provided value is not an empty string, adheres to the specified 
+    length limit, and does not include disallowed special characters.
+
+    Args:
+        value (str): The field value to validate.
+        length_limit (int): The maximum length allowed for the field value.
+
+    Returns:
+        str: The validated field value.
+    """
+    if not value:
+        raise ValueError(f"Value cannot be empty")
+    text_length = len(value.strip())
+    if text_length == 0 or text_length > length_limit:
+        raise ValueError(f"Value must be between 1 to {length_limit} characters long.")
+    disallowed_pattern = r"[^\w\s" + re.escape(allowed_special_characters) + "]"
+    if re.search(disallowed_pattern, value):
+        raise ValueError(f"Value contains disallowed special characters.")
+    return value

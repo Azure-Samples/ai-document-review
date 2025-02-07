@@ -72,4 +72,5 @@ class IssuesRepository:
             logging.info(f"Issue {issue_id} updated.")
             return Issue(**issue)
         else:
-            raise ValueError(f"Issue {issue_id} not found.")
+            raise ValueError(f"Issue not found.")
+

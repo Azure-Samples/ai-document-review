@@ -1,0 +1,21 @@
+import { Divider } from '@fluentui/react-components'
+import PageHeader from '../../components/PageHeader'
+import { sharedStyles } from '../../styles/sharedStyles'
+
+
+function Settings() {
+  const sharedClasses = sharedStyles()
+
+  return (
+    <div className={sharedClasses.container}>
+      <PageHeader
+        title="Manage Settings"
+        description="View and update the AI doc review agent configurations by updating existing settings or by adding
+            new ones to enhance your document analysis."
+      />
+      <Divider className={sharedClasses.divider} />
+    </div>
+  )
+}
+
+export default Settings

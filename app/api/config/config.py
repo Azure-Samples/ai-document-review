@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     cosmos_key: str = ""
     database_name: str = "state"
     issues_container: str = "issues"
+    agents_container: str = "agents"
     feedback_container: str = "feedback"
     storage_account_url: str = ""
     storage_container_name: str = "documents"

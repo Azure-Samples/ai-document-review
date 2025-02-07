@@ -4,7 +4,8 @@ import { accessTokenRequest } from '../authConfig'
 import { msalInstance } from '../main'
 import { FatalError, RetriableError } from '../types/error'
 
-const apiBaseUrl = '/api/v1/review/'
+const apiBaseUrl = '/api/v1/'
+const agentsPath = 'admin/agents/'
 const unknownError = 'an unknown error occurred. Please try again.'
 
 class AbortedError extends Error {}
@@ -137,4 +138,63 @@ export async function streamApi(
   }
 
   startStream()
+}
+
+export async function getAgents() {
+  try {
+    const response = await callApi(agentsPath);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Failed to fetch agents.');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching agents:', error);
+    throw error;
+  }
+}
+
+export async function addAgent(agent: { name: string; guideline_prompt: string; type: string; }) {
+  try {
+    const response = await callApi(agentsPath, 'POST', agent);
+    if (response.status === 201) {
+      return response.json();
+    }
+    const errorData = await response.json();
+    throw new Error(errorData.detail?.description || 'Failed to add agent.');
+  } catch (error) {
+    console.error('Error adding agent:', error);
+    throw error;
+  }
+}
+
+export async function updateAgent(
+  agentId: string,
+  agent: { name: string; guideline_prompt: string; type: string; }
+) {
+  try {
+    const response = await callApi(`${agentsPath}/${agentId}`, 'PATCH', agent);
+    if (response.ok) {
+      return response.json();
+    }
+    const errorData = await response.json();
+    throw new Error(errorData.detail?.description || 'Failed to update agent.');
+  } catch (error) {
+    console.error('Error updating agent:', error);
+    throw error;
+  }
+}
+
+export async function deleteAgent(id: string) {
+  try {
+    const response = await callApi(`${agentsPath}/${id}`, 'DELETE');
+    if (response.status === 204) {
+      return { message: 'Agent deleted successfully' };
+    }
+    const errorData = await response.json();
+    throw new Error(errorData.detail || 'Failed to delete agent.');
+  } catch (error) {
+    console.error('Error deleting agent:', error);
+    throw error;
+  }
 }

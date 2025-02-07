@@ -2,19 +2,19 @@ import { IPublicClientApplication } from "@azure/msal-browser";
 import { MsalAuthenticationTemplate, MsalProvider } from "@azure/msal-react";
 import { Avatar, Button, makeStyles } from "@fluentui/react-components";
 import { ChevronLeft20Regular } from "@fluentui/react-icons";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import logo from './assets/Azure.svg';
 import { interactionType, loginRequest } from "./authConfig";
-import Files from "./pages/files/Files";
-import Review from "./pages/review/Review";
+import { NavMenu, Pages } from "./Navigation";
+
 
 type AppProps = {
   pca: IPublicClientApplication;
 };
 
 const useStyles = makeStyles({
-  app: { backgroundColor: '#f5f5f5', color: '#fff', minHeight: '100vh' },
-  header: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '8px' },
+  app: { backgroundColor: '#f5f5f5', color: '#fff', minHeight: '100vh', overflowX: 'hidden'},
+  header: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', padding: '8px', width: '100%', boxSizing: 'border-box' },
   logo: {
     display: 'flex',
     alignItems: 'center',
@@ -30,6 +30,11 @@ const useStyles = makeStyles({
   },
   logoText: { textDecoration: 'none', color: '#000' },
   main: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  rightSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+  },
 });
 
 function App({ pca }: AppProps) {
@@ -50,7 +55,11 @@ function App({ pca }: AppProps) {
               <img src={logo} alt="logo" />
               <h3>AI Document Review</h3>
             </div>
-            <Avatar aria-label="User" size={40} />
+            <div className={classes.rightSection}>
+              <NavMenu />
+              <Avatar aria-label="User" size={32} />
+            </div>
+
           </header>
 
           <main className={classes.main}>
@@ -62,13 +71,5 @@ function App({ pca }: AppProps) {
   );
 }
 
-function Pages() {
-  return (
-      <Routes>
-          <Route path="/" element={<Files />} />
-          <Route path="/review" element={<Review />} />
-      </Routes>
-  );
-}
 
 export default App;

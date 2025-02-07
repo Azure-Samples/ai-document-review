@@ -3,9 +3,11 @@ import { Button, Caption1, Card, CardHeader, CardPreview, Dialog, DialogBody, Di
 import { ArrowUploadRegular, MoreHorizontal20Regular } from '@fluentui/react-icons';
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import aiDocIcon from '../../assets/ai-doc.png';
 import pdfIcon from '../../assets/pdf.svg';
 import { listBlobs, uploadBlob } from '../../services/storage';
+import PageHeader from '../../components/PageHeader';
+import { DOCUMENTATION_URL } from '../../constants';
+import ErrorMessage from '../../components/ErrorMessage';
 
 const flex = {
   gap: "16px",
@@ -103,27 +105,16 @@ function Files() {
 
   return (
     <div className={classes.container}>
-      <div className={classes.welcome}>
-        <div className={classes.heroImage}>
-          <img src={aiDocIcon} alt="AI Document Review Icon" width="150" />
-        </div>
-        <div>
-          <h2>Welcome to the AI Document Review accelerator</h2>
-          <p>Upload a new document to get started, or select an existing document to pick up where you left off.</p>
-          <Button size="large" onClick={() => window.open("https://github.com/Azure-Samples/ai-document-review", "_blank")}>
-            View documentation
-          </Button>
-        </div>
-      </div>
+        <PageHeader
+          title="Welcome to the AI Document Review accelerator"
+          description="Upload a new document to get started, or select an existing document to pick up where you left off."
+          customElement={<Button size="large" onClick={() => window.open(DOCUMENTATION_URL, "_blank")}>View documentation</Button>}
+      />
       <Divider className={classes.divider}/>
       <div className={classes.filesContainer}>
         { 
-          blobError && <MessageBar intent="error">
-            <MessageBarBody>
-              <MessageBarTitle>Error loading files</MessageBarTitle>
-              { blobError }
-            </MessageBarBody>
-          </MessageBar>
+          blobError &&
+          <ErrorMessage title="Error loading files" message={blobError} />
         }
         <div className={classes.row}>
           <input
