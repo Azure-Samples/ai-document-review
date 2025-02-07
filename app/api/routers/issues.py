@@ -30,6 +30,7 @@ def issues_event(issues: list[Issue]) -> str:
 )
 async def get_pdf_issues(
     doc_id: str,
+    rerun: Optional[bool] = False,
     user=Depends(validate_authenticated),
     issues_service=Depends(get_issues_service)
 ) -> StreamingResponse:
@@ -38,6 +39,7 @@ async def get_pdf_issues(
 
     Args:
         doc_id (str): The filename of the document
+        rerun (bool): Flag to re-run the review process even if issues are already stored
         user (Depends): The authenticated user.
 
     Returns:
@@ -46,7 +48,12 @@ async def get_pdf_issues(
     logging.info(f"Received initiate review request for document {doc_id}")
 
     try:
-        stored_issues = await issues_service.get_issues_data(doc_id)
+        if rerun:
+            logging.info(f"Re-run flag set to true. Deleting existing issues for {doc_id} and re-running check...")
+            await issues_service.delete_document_issues(doc_id)
+            stored_issues = []
+        else:
+            stored_issues = await issues_service.get_issues_data(doc_id)
 
         if stored_issues:
             logging.info(f"Found stored issues for document {doc_id}. Streaming issues...")
@@ -89,9 +96,9 @@ async def get_pdf_issues(
 
 @router.patch(
     "/api/v1/review/{doc_id}/issues/{issue_id}/accept",
-    summary="Accept issue and optionally provide feedback",
+    summary="Accept issue and optionally provide modified fields",
     responses={
-        HTTPStatus.OK: {"description": "Feedback updated successfully"},
+        HTTPStatus.OK: {"description": "Issue updated successfully"},
         HTTPStatus.UNAUTHORIZED: {"description": "Unauthorized"},
         HTTPStatus.BAD_REQUEST: {"description": "Invalid data provided"},
         HTTPStatus.UNPROCESSABLE_ENTITY: {"description": "Validation error"},

@@ -26,7 +26,7 @@ import {
   makeStyles
 } from '@fluentui/react-components'
 import {
-  CheckmarkFilled,
+  ArrowCounterclockwiseFilled, CheckmarkFilled,
   ChevronDown16Regular,
   ChevronUp16Regular,
   Eye20Regular,
@@ -116,6 +116,8 @@ function Review() {
   const classes = useStyles()
   const [searchParams] = useSearchParams()
 
+  const canRerun = import.meta.env.VITE_ALLOW_RERUN_CHECK! === 'true';
+
   const getAgentConfig = useCallback(() => {
     let typeIndex = 0
     const agentConfig: Record<string, { color: 'informative' | 'danger'; description: string }> = {}
@@ -140,15 +142,19 @@ function Review() {
 
   const checkButtonIcon = checkInProgress ? (
     <Spinner size="tiny" />
-  ) : checkComplete ? (
-    <CheckmarkFilled />
-  ) : undefined
+  ) : checkComplete
+      ? canRerun
+        ? <ArrowCounterclockwiseFilled />
+        : <CheckmarkFilled />
+      : undefined
 
   const checkButtonContent = checkInProgress
     ? 'Checking...'
     : checkComplete
-    ? 'Check complete'
-    : 'Run check'
+    ? canRerun
+          ? "Re-run check"
+          : "Check complete"
+        : 'Run check'
 
   // Callback on PDF load success
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
@@ -228,16 +234,23 @@ function Review() {
   }
 
   // Run check by opening stream with API and handling incoming events
-  const runCheck = useCallback(() => {
+  const runCheck = useCallback((rerun: boolean = false) => {
     if (docId) {
-      setCheckInProgress(true)
-      setCheckError(undefined)
-      setCheckComplete(false)
+      let uri = `${docId}/issues`;
+      if (rerun) {
+        uri += '?rerun=true';
+        setIssues([]);
+        // todo: clear annotations
+      }
+  
+      setCheckInProgress(true);
+      setCheckError(undefined);
+      setCheckComplete(false);
 
       abortControllerRef.current = new AbortController()
 
       streamApi(
-        `review/${docId}/issues`,
+        uri,
         (msg) => {
           switch (msg.event) {
             case APIEvent.Issues: {
@@ -422,11 +435,11 @@ function Review() {
         {docId && (
           <Button
             className={classes.checkButton}
-            disabledFocusable={checkInProgress || checkComplete}
-            appearance="outline"
+            disabledFocusable={checkInProgress || (checkComplete && !canRerun)}
+            appearance='outline'
             icon={checkButtonIcon}
             size="large"
-            onClick={runCheck}
+            onClick={() => runCheck(checkComplete && canRerun)}
           >
             {checkButtonContent}
           </Button>

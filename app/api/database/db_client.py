@@ -66,7 +66,7 @@ class CosmosDBClient:
                 return None
 
 
-    async def retrieve_items_by_values(self, filters: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+    async def retrieve_items_by_values(self, filters: Dict[str, Any], partition_key: str | None = None) -> Optional[List[Dict[str, Any]]]:
         """
         Retrieve items from the Cosmos DB container where specified columns match the given values.
         
@@ -83,9 +83,10 @@ class CosmosDBClient:
             items = self.container.query_items(
                 query=query,
                 parameters=parameters,
-                enable_cross_partition_query=True,
+                partition_key=partition_key,
+                enable_cross_partition_query=partition_key is None,
             )
-            
+
             # Convert the iterator to a list
             items_list = list(items)
             
@@ -111,3 +112,21 @@ class CosmosDBClient:
             else:
                 logging.error(f"An error occurred while deleting the item: {e}")
                 raise e
+
+
+    async def delete_items_by_values(self, filters: Dict[str, Any], partition_key: str | None = None) -> None:
+        """
+        Delete items from the Cosmos DB container where specified columns match the given values.
+        
+        :param filters: A dictionary where keys are column names and values are the values to match.
+        """
+        try:
+            # Delete each item
+            for item in await self.retrieve_items_by_values(filters, partition_key):
+                self.container.delete_item(item, partition_key=partition_key)
+
+            logging.info("Items deleted successfully.")
+
+        except CosmosHttpResponseError as e:
+            logging.error(f"An error occurred while deleting items: {e}")
+            raise e
