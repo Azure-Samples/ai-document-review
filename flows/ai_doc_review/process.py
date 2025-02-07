@@ -1,3 +1,4 @@
+from agents_service import fetch_latest_prompt_by_type
 from promptflow.core import tool
 from concurrent.futures import ThreadPoolExecutor as Pool
 from typing import Callable, Generator, Any
@@ -13,7 +14,12 @@ from flows import setup_flows
 
 def run_flow(flow: Tuple[IssueType, Callable], text: str) -> Tuple[IssueType, Any]:
     issue_type, flow_function = flow
-    return issue_type, flow_function(text=text)
+    logging.info(f"Running flow for flow_function {issue_type.value}")
+    guideline_prompt = str(fetch_latest_prompt_by_type(issue_type.value))
+    if not guideline_prompt:
+        logging.error(f"Invalid guidline prompt found: {issue_type.value}")
+        raise ValueError(f"Guideline prompt not found for issue type: {issue_type.value}")
+    return issue_type, flow_function(text=text, guideline_prompt_text=guideline_prompt)
 
 
 def get_issues_from_text_chunks(pdf_name: str, pagination: int) -> Generator[Any, Any, Any]:
@@ -23,11 +29,11 @@ def get_issues_from_text_chunks(pdf_name: str, pagination: int) -> Generator[Any
         for text_chunk in get_text_chunks(di_result, paragraphs_per_chunk=pagination):
             agent_flow_results = pool.map(partial(run_flow, text=text_chunk), flows.items())
 
-            # Process batches of agent results
+            logging.info(f"Processing agent results")
             for issue_type, agent_results in agent_flow_results:
                 output = AllCombinedIssues.model_validate_json(agent_results["agent_output"])
     
-                # Add type and bounding box to each issue
+                logging.info(f"Adding issue type and bounding box to issues")
                 for issue in output.issues:
                     issue.type = issue_type
                     try:

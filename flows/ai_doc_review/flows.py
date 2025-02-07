@@ -26,7 +26,7 @@ AGENT_PROMPTS = {
 }
 
 
-def create_flow(agent_prompt_path, consolidator_prompt_path, guidelines_prompt_path, connection):
+def create_flow(agent_prompt_path, consolidator_prompt_path, connection):
     flow = load_flow(TEMPLATE_FLOW_PATH)
     flow.context = FlowContext(
         connections={
@@ -36,7 +36,6 @@ def create_flow(agent_prompt_path, consolidator_prompt_path, guidelines_prompt_p
         overrides={
             "nodes.agent_prompt.source.path": str(agent_prompt_path),
             "nodes.consolidator_prompt.source.path": str(consolidator_prompt_path),
-            "nodes.guidelines_prompt.source.path": str(guidelines_prompt_path),
             "nodes.llm_multishot.inputs.module_path": str(MODELS_MODULE_PATH),
             "nodes.consolidator.inputs.module_path": str(MODELS_MODULE_PATH),
         }
@@ -55,7 +54,6 @@ def setup_flows():
         issue_type: create_flow(
             agent_prompt_path=AGENT_PROMPTS[issue_type]["agent"],
             consolidator_prompt_path=AGENT_PROMPTS[issue_type]["consolidator"],
-            guidelines_prompt_path=AGENT_PROMPTS[issue_type]["guidelines"],
             connection=connection,
         )
         for issue_type in AGENT_PROMPTS
