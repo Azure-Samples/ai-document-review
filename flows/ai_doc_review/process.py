@@ -1,4 +1,4 @@
-from agents_service import fetch_latest_prompt_by_type
+from agents_service import fetch_latest_prompt_by_type, retrieve_distinct_agent_types
 from promptflow.core import tool
 from concurrent.futures import ThreadPoolExecutor as Pool
 from typing import Callable, Generator, Any
@@ -14,16 +14,19 @@ from flows import setup_flows
 
 def run_flow(flow: Tuple[IssueType, Callable], text: str) -> Tuple[IssueType, Any]:
     issue_type, flow_function = flow
-    logging.info(f"Running flow for flow_function {issue_type.value}")
-    guideline_prompt = str(fetch_latest_prompt_by_type(issue_type.value))
+    logging.info(f"Running flow for flow_function")
+    guideline_prompt = str(fetch_latest_prompt_by_type(issue_type))
     if not guideline_prompt:
-        logging.error(f"Invalid guidline prompt found: {issue_type.value}")
-        raise ValueError(f"Guideline prompt not found for issue type: {issue_type.value}")
-    return issue_type, flow_function(text=text, guideline_prompt_text=guideline_prompt)
+        logging.error(f"Invalid guidline prompt found: {issue_type}")
+        raise ValueError(f"Guideline prompt not found for issue type: {issue_type}")
+    return issue_type, flow_function(text=text, issue_type=issue_type, guideline_prompt_text=guideline_prompt)
 
 
 def get_issues_from_text_chunks(pdf_name: str, pagination: int) -> Generator[Any, Any, Any]:
-    flows = setup_flows()
+    logging.info(f"Getting issue types")
+    issue_types = retrieve_distinct_agent_types()
+    logging.info(f"Setting up flows")
+    flows = setup_flows(issue_types)
     di_result = analyze_document(pdf_name)
     with Pool() as pool:
         for text_chunk in get_text_chunks(di_result, paragraphs_per_chunk=pagination):
@@ -35,6 +38,7 @@ def get_issues_from_text_chunks(pdf_name: str, pagination: int) -> Generator[Any
     
                 logging.info(f"Adding issue type and bounding box to issues")
                 for issue in output.issues:
+                    logging.debug(f"Adding issue type and bounding box to issue: {issue}")
                     issue.type = issue_type
                     try:
                         issue = add_bounding_box(di_result, issue)

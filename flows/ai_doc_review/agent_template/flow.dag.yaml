@@ -11,6 +11,9 @@ inputs:
   guideline_prompt_text:
     type: string
     is_chat_input: false
+  issue_type:
+    type: string
+    is_chat_input: false
 outputs:
   agent_output:
     type: string
@@ -80,4 +83,5 @@ nodes:
     path: agent.jinja2
   inputs:
     guidelines: ${inputs.guideline_prompt_text}
+    issue_type: ${inputs.issue_type}
   use_variants: false
