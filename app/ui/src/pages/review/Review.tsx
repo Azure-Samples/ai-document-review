@@ -236,7 +236,7 @@ function Review() {
   // Run check by opening stream with API and handling incoming events
   const runCheck = useCallback((rerun: boolean = false) => {
     if (docId) {
-      let uri = `${docId}/issues`;
+      let uri = `review/${docId}/issues`;
       if (rerun) {
         uri += '?rerun=true';
         setIssues([]);
@@ -466,7 +466,7 @@ function Review() {
           </TagPicker>
         </Field>
         <div>
-          <h4>Issue types</h4>
+          <h4>Agents</h4>
           <Divider />
         </div>
         {Object.entries(agentConfig).map((entry) => (
