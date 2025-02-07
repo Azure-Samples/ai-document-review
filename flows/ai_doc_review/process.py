@@ -1,18 +1,17 @@
+import logging
 from agents_service import fetch_latest_prompt_by_type, retrieve_distinct_agent_types
 from promptflow.core import tool
 from concurrent.futures import ThreadPoolExecutor as Pool
 from typing import Callable, Generator, Any
 from functools import partial
 from typing import Tuple
-import logging
-
 from bounding_box import add_bounding_box
-from common.models import AllCombinedIssues, IssueType
+from common.models import AllCombinedIssues
 from text import analyze_document, get_text_chunks
 from flows import setup_flows
 
 
-def run_flow(flow: Tuple[IssueType, Callable], text: str) -> Tuple[IssueType, Any]:
+def run_flow(flow: Tuple[str, Callable], text: str) -> Tuple[str, Any]:
     issue_type, flow_function = flow
     logging.info(f"Running flow for flow_function")
     guideline_prompt = str(fetch_latest_prompt_by_type(issue_type))

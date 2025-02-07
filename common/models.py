@@ -5,7 +5,7 @@ from typing import Optional
 
 
 text_max_length = 50
-long_text_max_length = 5000
+long_text_max_length = 50000
 allowed_special_characters = r"[\[\]\,\.\!\?\:\"\'\-\(\)\_\$\£\#\@\+\=\&\%\*\!\/]"
 
 class Location(BaseModel):
@@ -15,13 +15,8 @@ class Location(BaseModel):
     para_index: int
 
 
-class IssueType(str, Enum):
-    GrammarSpelling = 'Grammar & Spelling'
-    DefinitiveLanguage = 'Definitive Language'
-
-
 class SingleShotIssue(BaseModel):
-    type: IssueType
+    type: str
     location: Location
     text: str
     explanation: str
@@ -53,7 +48,7 @@ class AllCombinedIssues(BaseModel):
 
 
 class BaseIssue(BaseModel):
-    type: IssueType
+    type: str
     location: Location
     text: str
     explanation: str
@@ -83,7 +78,7 @@ class Issue(BaseModel):
     id: str
     doc_id: str
     text: str
-    type: IssueType
+    type: str
     status: IssueStatusEnum
     suggested_fix: str
     explanation: str

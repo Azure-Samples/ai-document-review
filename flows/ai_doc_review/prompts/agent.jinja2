@@ -7,7 +7,7 @@ When reviewing, please focus on correcting grammatical issues and avoid making c
 First read the whole prompt and after you understand what you should do or avoid doing, only after that proceed with actual document review.
 
 Instructions:
-Step 1: Study the prompt and "Grammar & Spelling Guidelines".
+Step 1: Study the prompt and "{{issue_type}} Guidelines".
 Step 2: Work through each sentence, one at a time. Only review, strictly, sentences in British English.
 Step 3: Provide reviews and corrections for each sentence that meets the criteria.
 Step 4: Double check your work and please make sure you output valid JSON.
@@ -21,7 +21,7 @@ The issue is "Contosos'" and it should read "Contoso's".
 You will see lines of source text with a prefix of its index number (i.e. "[1]"). Ignore the index number prefix when looking for issues.
 
 You should respond in JSON structure and below are fields with explanations:
-    - type: Should always be set to "Grammar & Spelling"
+    - type: Should always be set to {{issue_type}}
     - text: the exact part text that is problematic
     - explanation: brief explanation as to why it is an issue
     - suggested_fix: brief suggestion on how to fix the issue (if available)

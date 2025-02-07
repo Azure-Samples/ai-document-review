@@ -1,6 +1,5 @@
 import pytest
 import asyncio
-from common.models import IssueType
 import json
 from services.issues_service import IssuesService
 
@@ -82,8 +81,8 @@ async def test_initiate_review_valid_chunks(mock_issues_repo, mock_aml_client, d
     issues_service = IssuesService(mock_issues_repo, mock_aml_client)
     async for issues in issues_service.initiate_review(doc_name, dummy_user, "2021-09-01"):
             assert len(issues) == 2
-            assert issues[0].type == IssueType.GrammarSpelling
-            assert issues[1].type == IssueType.DefinitiveLanguage
+            assert issues[0].type == "Grammar & Spelling"
+            assert issues[1].type == "Definitive Language"
 
             for issue in issues:
                 assert issue.doc_id == doc_name

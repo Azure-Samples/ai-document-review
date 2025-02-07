@@ -92,7 +92,7 @@ export function IssueCard({ docId, issue, selected, onSelect, onUpdate }: IssueC
       setAccepting(true)
       // Send the request
       const response = await callApi(
-        `${docId}/issues/${issue.id}/accept`,
+        `review/${docId}/issues/${issue.id}/accept`,
         'PATCH',
         Object.keys(modifiedFields).length ? modifiedFields : undefined
       )
@@ -118,7 +118,7 @@ export function IssueCard({ docId, issue, selected, onSelect, onUpdate }: IssueC
   async function handleDismiss() {
     try {
       setDismissing(true)
-      const response = await callApi(`${docId}/issues/${issue.id}/dismiss`, 'PATCH')
+      const response = await callApi(`review/${docId}/issues/${issue.id}/dismiss`, 'PATCH')
       const updatedIssue = (await response.json()) as Issue
       if (onUpdate) {
         onUpdate(updatedIssue)
@@ -141,7 +141,7 @@ export function IssueCard({ docId, issue, selected, onSelect, onUpdate }: IssueC
   async function handleSubmitFeedback() {
     try {
       setSubmittingFeedback(true)
-      await callApi(`${docId}/issues/${issue.id}/feedback`, 'PATCH', feedback)
+      await callApi(`review/${docId}/issues/${issue.id}/feedback`, 'PATCH', feedback)
       setFeedbackSubmitted(true)
       setAddFeedback(false)
     } catch (err) {

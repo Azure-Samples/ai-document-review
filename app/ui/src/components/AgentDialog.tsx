@@ -133,7 +133,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
         [field]: value
       }))
 
-      const error = hasErrorInInput(value, field === 'guideline_prompt' ? 5000 : 50)
+      const error = hasErrorInInput(value, field === 'guideline_prompt' ? 50000 : 50)
       if (field === 'name') setNameInputError(error)
       if (field === 'type') setTypeInputError(error)
       if (field === 'guideline_prompt') setPromptInputError(error)
@@ -173,7 +173,7 @@ const AgentDialog: React.FC<AgentDialogProps> = ({
     setLoading(true)
     setNameInputError(hasErrorInInput(localAgent.name, 50))
     setTypeInputError(hasErrorInInput(localAgent.type, 50))
-    setPromptInputError(hasErrorInInput(localAgent.guideline_prompt, 5000))
+    setPromptInputError(hasErrorInInput(localAgent.guideline_prompt, 50000))
 
     if (
       !hasClientSideError &&
